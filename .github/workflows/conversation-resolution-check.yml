@@ -45,7 +45,14 @@ permissions:
 jobs:
   evaluate:
     name: All conversations resolved
-    if: github.event_name != 'pull_request_target' || github.event.pull_request.draft == false
+    # Skip drafts across every event source. The original guard only
+    # covered pull_request_target, but pull_request_review and
+    # pull_request_review_comment events also carry a pull_request
+    # object with .draft, and a review/comment on an in-progress draft
+    # should not post a failure check_run. workflow_dispatch has no
+    # pull_request in the payload, so we fall through and let the
+    # job run; manual dispatch is an explicit ask.
+    if: github.event.pull_request == null || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 5
     # Coalesce bursts (a push + Greptile review + several thread resolves can
@@ -143,10 +150,10 @@ jobs:
                   (if .isOutdated then " *(outdated — line no longer exists; likely addressed by a later commit)*" else "" end)
                 ] | join("\n")) +
                 (if $count > 10 then "\n\n_… and " + ($count - 10 | tostring) + " more._" else "" end) +
-                "\n\n---\n\n**To unblock the merge**, click \"Resolve conversation\" on each unresolved thread in the GitHub UI.\n\nMerge is gated by Mergify (`#review-threads-unresolved = 0` in `.mergify.yml`); this check is the visibility layer so the blocker shows up here regardless of whether the `ready-to-merge` label has been applied yet."
+                "\n\n---\n\n**To unblock the merge**, click \"Resolve conversation\" on each unresolved thread in the GitHub UI. Per repo convention every Greptile finding should be resolved (in code, or with a concrete reply explaining the deferral) before merge."
               ;
               listing
-            ' --arg PR_NUMBER "${PR_NUMBER}" "${threads_json}")
+            ' "${threads_json}")
           fi
 
           payload="$(mktemp)"
