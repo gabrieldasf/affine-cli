@@ -1,0 +1,4142 @@
+{
+  "generated_at": "2026-06-17T17:47:48.460183+00:00",
+  "source_repo": "D:\\Apps\\QTZ-Apps\\qtz-affine",
+  "source_git_head": "16dfe39fa342676401d1281b252053be50c9c034",
+  "schema": {
+    "path": "D:\\Apps\\QTZ-Apps\\qtz-affine\\packages\\backend\\server\\src\\schema.gql",
+    "query_field_count": 23,
+    "mutation_field_count": 109,
+    "query_fields": [
+      {
+        "name": "adminAllSharedLinks",
+        "args": [
+          {
+            "name": "filter",
+            "type": "AdminAllSharedLinksFilterInput",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "pagination",
+            "type": "PaginationInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "PaginatedAdminAllSharedLink!"
+      },
+      {
+        "name": "adminDashboard",
+        "args": [
+          {
+            "name": "input",
+            "type": "AdminDashboardInput",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "AdminDashboard!"
+      },
+      {
+        "name": "adminWorkspace",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "AdminWorkspace"
+      },
+      {
+        "name": "adminWorkspaces",
+        "args": [
+          {
+            "name": "filter",
+            "type": "ListWorkspaceInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[AdminWorkspace!]!"
+      },
+      {
+        "name": "adminWorkspacesCount",
+        "args": [
+          {
+            "name": "filter",
+            "type": "ListWorkspaceInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Int!"
+      },
+      {
+        "name": "appConfig",
+        "args": [],
+        "return_type": "JSONObject!"
+      },
+      {
+        "name": "currentUser",
+        "args": [],
+        "return_type": "UserType"
+      },
+      {
+        "name": "error",
+        "args": [
+          {
+            "name": "name",
+            "type": "ErrorNames!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "ErrorDataUnion!"
+      },
+      {
+        "name": "getInviteInfo",
+        "args": [
+          {
+            "name": "inviteId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "InvitationType!"
+      },
+      {
+        "name": "prices",
+        "args": [],
+        "return_type": "[SubscriptionPrice!]!"
+      },
+      {
+        "name": "publicUserById",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "PublicUserType"
+      },
+      {
+        "name": "queryWorkspaceEmbeddingStatus",
+        "args": [
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "ContextWorkspaceEmbeddingStatus! @deprecated(reason: \"Use realtime subscription \\\"workspace.embedding.progress.changed\\\" instead.\")"
+      },
+      {
+        "name": "revealedAccessTokens",
+        "args": [],
+        "return_type": "[RevealedAccessToken!]! @deprecated(reason: \"use currentUser.revealedAccessTokens\")"
+      },
+      {
+        "name": "serverConfig",
+        "args": [],
+        "return_type": "ServerConfigType!"
+      },
+      {
+        "name": "user",
+        "args": [
+          {
+            "name": "email",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserOrLimitedUser"
+      },
+      {
+        "name": "userByEmail",
+        "args": [
+          {
+            "name": "email",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType"
+      },
+      {
+        "name": "userById",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "users",
+        "args": [
+          {
+            "name": "filter",
+            "type": "ListUserInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[UserType!]!"
+      },
+      {
+        "name": "usersCount",
+        "args": [
+          {
+            "name": "filter",
+            "type": "ListUserInput",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "Int!"
+      },
+      {
+        "name": "validateAppConfig",
+        "args": [
+          {
+            "name": "updates",
+            "type": "[UpdateAppConfigInput!]!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[AppConfigValidateResult!]!"
+      },
+      {
+        "name": "workspace",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "WorkspaceType!"
+      },
+      {
+        "name": "workspaceRolePermissions",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "WorkspaceRolePermissions! @deprecated(reason: \"use WorkspaceType[permissions] instead\")"
+      },
+      {
+        "name": "workspaces",
+        "args": [],
+        "return_type": "[WorkspaceType!]!"
+      }
+    ],
+    "mutation_fields": [
+      {
+        "name": "abortBlobUpload",
+        "args": [
+          {
+            "name": "key",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "uploadId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "acceptInviteById",
+        "args": [
+          {
+            "name": "inviteId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "sendAcceptMail",
+            "type": "Boolean @deprecated(reason: \"never used\")",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String @deprecated(reason: \"never used\")",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "activateLicense",
+        "args": [
+          {
+            "name": "license",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "License!"
+      },
+      {
+        "name": "addContextBlob",
+        "args": [
+          {
+            "name": "options",
+            "type": "AddContextBlobInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CopilotContextBlob!"
+      },
+      {
+        "name": "addContextCategory",
+        "args": [
+          {
+            "name": "options",
+            "type": "AddContextCategoryInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CopilotContextCategory!"
+      },
+      {
+        "name": "addContextDoc",
+        "args": [
+          {
+            "name": "options",
+            "type": "AddContextDocInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CopilotContextDoc!"
+      },
+      {
+        "name": "addContextFile",
+        "args": [
+          {
+            "name": "content",
+            "type": "Upload!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "options",
+            "type": "AddContextFileInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CopilotContextFile!"
+      },
+      {
+        "name": "addWorkspaceEmbeddingFiles",
+        "args": [
+          {
+            "name": "blob",
+            "type": "Upload!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CopilotWorkspaceFile!"
+      },
+      {
+        "name": "adminUpdateWorkspace",
+        "args": [
+          {
+            "name": "input",
+            "type": "AdminUpdateWorkspaceInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "AdminWorkspace"
+      },
+      {
+        "name": "approveMember",
+        "args": [
+          {
+            "name": "userId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "banUser",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "cancelSubscription",
+        "args": [
+          {
+            "name": "idempotencyKey",
+            "type": "String @deprecated(reason: \"use header `Idempotency-Key`\")",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "plan",
+            "type": "SubscriptionPlan",
+            "required": false,
+            "default": "Pro"
+          },
+          {
+            "name": "workspaceId",
+            "type": "String",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "SubscriptionType!"
+      },
+      {
+        "name": "changeEmail",
+        "args": [
+          {
+            "name": "email",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "token",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "changePassword",
+        "args": [
+          {
+            "name": "newPassword",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "token",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "userId",
+            "type": "String",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "cleanupCopilotSession",
+        "args": [
+          {
+            "name": "options",
+            "type": "DeleteSessionInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[String!]!"
+      },
+      {
+        "name": "clearWorkspaceByokConfigs",
+        "args": [
+          {
+            "name": "provider",
+            "type": "ByokProvider",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "completeBlobUpload",
+        "args": [
+          {
+            "name": "key",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "parts",
+            "type": "[BlobUploadPartInput!]",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "uploadId",
+            "type": "String",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "createBlobUpload",
+        "args": [
+          {
+            "name": "key",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "mime",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "size",
+            "type": "Int!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "BlobUploadInit!"
+      },
+      {
+        "name": "createChangePasswordUrl",
+        "args": [
+          {
+            "name": "callbackUrl",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "userId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "createCheckoutSession",
+        "args": [
+          {
+            "name": "input",
+            "type": "CreateCheckoutSessionInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "createComment",
+        "args": [
+          {
+            "name": "input",
+            "type": "CommentCreateInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CommentObjectType!"
+      },
+      {
+        "name": "createCopilotContext",
+        "args": [
+          {
+            "name": "sessionId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "createCopilotMessage",
+        "args": [
+          {
+            "name": "options",
+            "type": "CreateChatMessageInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "createCopilotSession",
+        "args": [
+          {
+            "name": "options",
+            "type": "CreateChatSessionInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String! @deprecated(reason: \"use `createCopilotSessionWithHistory` instead\")"
+      },
+      {
+        "name": "createCopilotSessionWithHistory",
+        "args": [
+          {
+            "name": "options",
+            "type": "CreateChatSessionInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CopilotHistories!"
+      },
+      {
+        "name": "createCustomerPortal",
+        "args": [],
+        "return_type": "String!"
+      },
+      {
+        "name": "createInviteLink",
+        "args": [
+          {
+            "name": "expireTime",
+            "type": "WorkspaceInviteLinkExpireTime!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "InviteLink!"
+      },
+      {
+        "name": "createReply",
+        "args": [
+          {
+            "name": "input",
+            "type": "ReplyCreateInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "ReplyObjectType!"
+      },
+      {
+        "name": "createSelfhostWorkspaceCustomerPortal",
+        "args": [
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "createUser",
+        "args": [
+          {
+            "name": "input",
+            "type": "CreateUserInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "createWorkspace",
+        "args": [
+          {
+            "name": "init",
+            "type": "Upload",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "WorkspaceType!"
+      },
+      {
+        "name": "createWorkspaceByokLocalLease",
+        "args": [
+          {
+            "name": "input",
+            "type": "CreateWorkspaceByokLocalLeaseInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CreateWorkspaceByokLocalLeaseResultType!"
+      },
+      {
+        "name": "deactivateLicense",
+        "args": [
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "deleteAccount",
+        "args": [],
+        "return_type": "DeleteAccount!"
+      },
+      {
+        "name": "deleteBlob",
+        "args": [
+          {
+            "name": "hash",
+            "type": "String @deprecated(reason: \"use parameter [key]\")",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "key",
+            "type": "String",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "permanently",
+            "type": "Boolean!",
+            "required": true,
+            "default": "false"
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "deleteComment",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "deleteReply",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "deleteUser",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "DeleteAccount!"
+      },
+      {
+        "name": "deleteWorkspace",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "deleteWorkspaceByokConfig",
+        "args": [
+          {
+            "name": "id",
+            "type": "ID!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "enableUser",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "forkCopilotSession",
+        "args": [
+          {
+            "name": "options",
+            "type": "ForkChatSessionInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "generateLicenseKey",
+        "args": [
+          {
+            "name": "sessionId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "generateUserAccessToken",
+        "args": [
+          {
+            "name": "input",
+            "type": "GenerateAccessTokenInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "RevealedAccessToken!"
+      },
+      {
+        "name": "grantCommercialEntitlement",
+        "args": [
+          {
+            "name": "plan",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "quantity",
+            "type": "Int",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "targetId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "targetType",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "grantDocUserRoles",
+        "args": [
+          {
+            "name": "input",
+            "type": "GrantDocUserRolesInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "grantMember",
+        "args": [
+          {
+            "name": "permission",
+            "type": "Permission!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "userId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "importUsers",
+        "args": [
+          {
+            "name": "input",
+            "type": "ImportUsersInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[UserImportResultType!]!"
+      },
+      {
+        "name": "installLicense",
+        "args": [
+          {
+            "name": "license",
+            "type": "Upload!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "License!"
+      },
+      {
+        "name": "inviteMembers",
+        "args": [
+          {
+            "name": "emails",
+            "type": "[String!]!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[InviteResult!]!"
+      },
+      {
+        "name": "leaveWorkspace",
+        "args": [
+          {
+            "name": "sendLeaveMail",
+            "type": "Boolean @deprecated(reason: \"no used anymore\")",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceName",
+            "type": "String @deprecated(reason: \"no longer used\")",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "linkCalDAVAccount",
+        "args": [
+          {
+            "name": "input",
+            "type": "LinkCalDAVAccountInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CalendarAccountObjectType!"
+      },
+      {
+        "name": "linkCalendarAccount",
+        "args": [
+          {
+            "name": "input",
+            "type": "LinkCalendarAccountInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "mentionUser",
+        "args": [
+          {
+            "name": "input",
+            "type": "MentionInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "ID!"
+      },
+      {
+        "name": "previewLicense",
+        "args": [
+          {
+            "name": "license",
+            "type": "Upload!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "AdminLicensePreview!"
+      },
+      {
+        "name": "publishDoc",
+        "args": [
+          {
+            "name": "docId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "mode",
+            "type": "PublicDocMode",
+            "required": false,
+            "default": "Page"
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "DocType!"
+      },
+      {
+        "name": "queueWorkspaceEmbedding",
+        "args": [
+          {
+            "name": "docId",
+            "type": "[String!]!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "readAllNotifications",
+        "args": [],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "readNotification",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "recoverDoc",
+        "args": [
+          {
+            "name": "guid",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "timestamp",
+            "type": "DateTime!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "DateTime!"
+      },
+      {
+        "name": "refreshUserSubscriptions",
+        "args": [],
+        "return_type": "[SubscriptionType!]!"
+      },
+      {
+        "name": "releaseDeletedBlobs",
+        "args": [
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "removeAvatar",
+        "args": [],
+        "return_type": "RemoveAvatar!"
+      },
+      {
+        "name": "removeContextBlob",
+        "args": [
+          {
+            "name": "options",
+            "type": "RemoveContextBlobInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "removeContextCategory",
+        "args": [
+          {
+            "name": "options",
+            "type": "RemoveContextCategoryInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "removeContextDoc",
+        "args": [
+          {
+            "name": "options",
+            "type": "RemoveContextDocInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "removeContextFile",
+        "args": [
+          {
+            "name": "options",
+            "type": "RemoveContextFileInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "removeWorkspaceEmbeddingFiles",
+        "args": [
+          {
+            "name": "fileId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "reorderWorkspaceByokConfigs",
+        "args": [
+          {
+            "name": "input",
+            "type": "ReorderWorkspaceByokConfigsInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[WorkspaceByokKeyConfigType!]!"
+      },
+      {
+        "name": "requestApplySubscription",
+        "args": [
+          {
+            "name": "transactionId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[SubscriptionType!]!"
+      },
+      {
+        "name": "resolveComment",
+        "args": [
+          {
+            "name": "input",
+            "type": "CommentResolveInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "resumeSubscription",
+        "args": [
+          {
+            "name": "idempotencyKey",
+            "type": "String @deprecated(reason: \"use header `Idempotency-Key`\")",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "plan",
+            "type": "SubscriptionPlan",
+            "required": false,
+            "default": "Pro"
+          },
+          {
+            "name": "workspaceId",
+            "type": "String",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "SubscriptionType!"
+      },
+      {
+        "name": "retryTranscriptTask",
+        "args": [
+          {
+            "name": "taskId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "TranscriptionResultType"
+      },
+      {
+        "name": "revokeCommercialEntitlement",
+        "args": [
+          {
+            "name": "targetId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "targetType",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "revokeDocUserRoles",
+        "args": [
+          {
+            "name": "input",
+            "type": "RevokeDocUserRoleInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "revokeInviteLink",
+        "args": [
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "revokeMember",
+        "args": [
+          {
+            "name": "userId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "revokePublicDoc",
+        "args": [
+          {
+            "name": "docId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "DocType!"
+      },
+      {
+        "name": "revokeUserAccessToken",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "sendChangeEmail",
+        "args": [
+          {
+            "name": "callbackUrl",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "sendChangePasswordEmail",
+        "args": [
+          {
+            "name": "callbackUrl",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "email",
+            "type": "String @deprecated(reason: \"fetched from signed in user\")",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "sendSetPasswordEmail",
+        "args": [
+          {
+            "name": "callbackUrl",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "email",
+            "type": "String @deprecated(reason: \"fetched from signed in user\")",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "sendTestEmail",
+        "args": [
+          {
+            "name": "config",
+            "type": "JSONObject!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "sendVerifyChangeEmail",
+        "args": [
+          {
+            "name": "callbackUrl",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "email",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "token",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "sendVerifyEmail",
+        "args": [
+          {
+            "name": "callbackUrl",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "setBlob",
+        "args": [
+          {
+            "name": "blob",
+            "type": "Upload!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "settleTranscriptTask",
+        "args": [
+          {
+            "name": "taskId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "TranscriptionResultType"
+      },
+      {
+        "name": "submitTranscriptTask",
+        "args": [
+          {
+            "name": "blob",
+            "type": "Upload",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "blobId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "blobs",
+            "type": "[Upload!]",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "input",
+            "type": "SubmitAudioTranscriptionInput",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "TranscriptionResultType"
+      },
+      {
+        "name": "testWorkspaceByokConfig",
+        "args": [
+          {
+            "name": "input",
+            "type": "TestWorkspaceByokConfigInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "TestWorkspaceByokConfigResultType!"
+      },
+      {
+        "name": "unlinkCalendarAccount",
+        "args": [
+          {
+            "name": "accountId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "updateAppConfig",
+        "args": [
+          {
+            "name": "updates",
+            "type": "[UpdateAppConfigInput!]!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "JSONObject!"
+      },
+      {
+        "name": "updateCalendarAccount",
+        "args": [
+          {
+            "name": "accountId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "refreshIntervalMinutes",
+            "type": "Int!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "CalendarAccountObjectType"
+      },
+      {
+        "name": "updateComment",
+        "args": [
+          {
+            "name": "input",
+            "type": "CommentUpdateInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "updateCopilotSession",
+        "args": [
+          {
+            "name": "options",
+            "type": "UpdateChatSessionInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "updateDocDefaultRole",
+        "args": [
+          {
+            "name": "input",
+            "type": "UpdateDocDefaultRoleInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "updateDocUserRole",
+        "args": [
+          {
+            "name": "input",
+            "type": "UpdateDocUserRoleInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "updateProfile",
+        "args": [
+          {
+            "name": "input",
+            "type": "UpdateUserInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "updateReply",
+        "args": [
+          {
+            "name": "input",
+            "type": "ReplyUpdateInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "updateSettings",
+        "args": [
+          {
+            "name": "input",
+            "type": "UpdateUserSettingsInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      },
+      {
+        "name": "updateSubscriptionRecurring",
+        "args": [
+          {
+            "name": "idempotencyKey",
+            "type": "String @deprecated(reason: \"use header `Idempotency-Key`\")",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "plan",
+            "type": "SubscriptionPlan",
+            "required": false,
+            "default": "Pro"
+          },
+          {
+            "name": "recurring",
+            "type": "SubscriptionRecurring!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String",
+            "required": false,
+            "default": ""
+          }
+        ],
+        "return_type": "SubscriptionType!"
+      },
+      {
+        "name": "updateUser",
+        "args": [
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "input",
+            "type": "ManageUserInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "updateUserFeatures",
+        "args": [
+          {
+            "name": "features",
+            "type": "[FeatureType!]!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "id",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "[FeatureType!]!"
+      },
+      {
+        "name": "updateWorkspace",
+        "args": [
+          {
+            "name": "input",
+            "type": "UpdateWorkspaceInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "WorkspaceType!"
+      },
+      {
+        "name": "updateWorkspaceCalendars",
+        "args": [
+          {
+            "name": "input",
+            "type": "UpdateWorkspaceCalendarsInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "WorkspaceCalendarObjectType!"
+      },
+      {
+        "name": "updateWorkspaceEmbeddingIgnoredDocs",
+        "args": [
+          {
+            "name": "add",
+            "type": "[String!]",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "remove",
+            "type": "[String!]",
+            "required": false,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Int!"
+      },
+      {
+        "name": "uploadAvatar",
+        "args": [
+          {
+            "name": "avatar",
+            "type": "Upload!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "UserType!"
+      },
+      {
+        "name": "uploadCommentAttachment",
+        "args": [
+          {
+            "name": "attachment",
+            "type": "Upload!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "docId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          },
+          {
+            "name": "workspaceId",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "String!"
+      },
+      {
+        "name": "upsertWorkspaceByokConfig",
+        "args": [
+          {
+            "name": "input",
+            "type": "UpsertWorkspaceByokConfigInput!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "WorkspaceByokKeyConfigType!"
+      },
+      {
+        "name": "verifyEmail",
+        "args": [
+          {
+            "name": "token",
+            "type": "String!",
+            "required": true,
+            "default": ""
+          }
+        ],
+        "return_type": "Boolean!"
+      }
+    ]
+  },
+  "documents": {
+    "root": "D:\\Apps\\QTZ-Apps\\qtz-affine\\packages\\common\\graphql\\src\\graphql",
+    "file_count": 192,
+    "operation_count": 188,
+    "query_operation_count": 76,
+    "mutation_operation_count": 112,
+    "fragment_count": 5,
+    "operations": [
+      {
+        "name": "ImportUsers",
+        "kind": "mutation",
+        "file": "admin/import-users.gql",
+        "root_field": "importUsers",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "abortBlobUpload",
+        "kind": "mutation",
+        "file": "blob-upload-abort.gql",
+        "root_field": "abortBlobUpload",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId",
+          "key",
+          "uploadId"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "acceptInviteByInviteId",
+        "kind": "mutation",
+        "file": "workspace-invite-accept-by-invite-id.gql",
+        "root_field": "acceptInviteById",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "inviteId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "activateLicense",
+        "kind": "mutation",
+        "file": "license/activate-license.gql",
+        "root_field": "activateLicense",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId",
+          "license"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "addContextBlob",
+        "kind": "mutation",
+        "file": "copilot-context-blob-add.gql",
+        "root_field": "addContextBlob",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "addContextCategory",
+        "kind": "mutation",
+        "file": "copilot-context-category-add.gql",
+        "root_field": "addContextCategory",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "addContextDoc",
+        "kind": "mutation",
+        "file": "copilot-context-doc-add.gql",
+        "root_field": "addContextDoc",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "addContextFile",
+        "kind": "mutation",
+        "file": "copilot-context-file-add.gql",
+        "root_field": "addContextFile",
+        "group": "copilots",
+        "variables_declared": [
+          "content",
+          "options"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "addWorkspaceEmbeddingFiles",
+        "kind": "mutation",
+        "file": "copilot-workspace-file-add.gql",
+        "root_field": "addWorkspaceEmbeddingFiles",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "blob"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "addWorkspaceEmbeddingIgnoredDocs",
+        "kind": "mutation",
+        "file": "copilot-workspace-ignored-docs-add.gql",
+        "root_field": "updateWorkspaceEmbeddingIgnoredDocs",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "add"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "adminUpdateWorkspace",
+        "kind": "mutation",
+        "file": "admin/admin-update-workspace.gql",
+        "root_field": "adminUpdateWorkspace",
+        "group": "admins",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "approveWorkspaceTeamMember",
+        "kind": "mutation",
+        "file": "workspace-team-approve.gql",
+        "root_field": "approveMember",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "userId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "cancelSubscription",
+        "kind": "mutation",
+        "file": "cancel-subscription.gql",
+        "root_field": "cancelSubscription",
+        "group": "graphql",
+        "variables_declared": [
+          "plan",
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "changeEmail",
+        "kind": "mutation",
+        "file": "change-email.gql",
+        "root_field": "changeEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "token",
+          "email"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "changePassword",
+        "kind": "mutation",
+        "file": "change-password.gql",
+        "root_field": "changePassword",
+        "group": "graphql",
+        "variables_declared": [
+          "token",
+          "userId",
+          "newPassword"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "cleanupCopilotSession",
+        "kind": "mutation",
+        "file": "copilot-session-cleanup.gql",
+        "root_field": "cleanupCopilotSession",
+        "group": "copilots",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "clearWorkspaceByokConfigs",
+        "kind": "mutation",
+        "file": "workspace-byok-config-clear.gql",
+        "root_field": "clearWorkspaceByokConfigs",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "completeBlobUpload",
+        "kind": "mutation",
+        "file": "blob-upload-complete.gql",
+        "root_field": "completeBlobUpload",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId",
+          "key",
+          "uploadId",
+          "parts"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "createBlobUpload",
+        "kind": "mutation",
+        "file": "blob-upload-create.gql",
+        "root_field": "createBlobUpload",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId",
+          "key",
+          "size",
+          "mime"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "createChangePasswordUrl",
+        "kind": "mutation",
+        "file": "admin/change-password-url.gql",
+        "root_field": "createChangePasswordUrl",
+        "group": "graphql",
+        "variables_declared": [
+          "callbackUrl",
+          "userId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createCheckoutSession",
+        "kind": "mutation",
+        "file": "create-checkout-link.gql",
+        "root_field": "createCheckoutSession",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createComment",
+        "kind": "mutation",
+        "file": "comment-create.gql",
+        "root_field": "createComment",
+        "group": "comments",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createCopilotContext",
+        "kind": "mutation",
+        "file": "copilot-context-create.gql",
+        "root_field": "createCopilotContext",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "sessionId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createCopilotMessage",
+        "kind": "mutation",
+        "file": "copilot-message-create.gql",
+        "root_field": "createCopilotMessage",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createCopilotSession",
+        "kind": "mutation",
+        "file": "copilot-session-create.gql",
+        "root_field": "createCopilotSession",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createCopilotSessionWithHistory",
+        "kind": "mutation",
+        "file": "copilot-session-create-with-history.gql",
+        "root_field": "createCopilotSessionWithHistory",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createCustomerPortal",
+        "kind": "mutation",
+        "file": "create-customer-portal.gql",
+        "root_field": "createCustomerPortal",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "createInviteLink",
+        "kind": "mutation",
+        "file": "workspace-invite-link.gql",
+        "root_field": "createInviteLink",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "expireTime"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createReply",
+        "kind": "mutation",
+        "file": "comment-reply-create.gql",
+        "root_field": "createReply",
+        "group": "comments",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createSelfhostCustomerPortal",
+        "kind": "mutation",
+        "file": "create-self-host-customer-portal.gql",
+        "root_field": "createSelfhostWorkspaceCustomerPortal",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createUser",
+        "kind": "mutation",
+        "file": "admin/create-user.gql",
+        "root_field": "createUser",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "createWorkspace",
+        "kind": "mutation",
+        "file": "create-workspace.gql",
+        "root_field": "createWorkspace",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "createWorkspaceByokLocalLease",
+        "kind": "mutation",
+        "file": "workspace-byok-local-lease-create.gql",
+        "root_field": "createWorkspaceByokLocalLease",
+        "group": "workspaces",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "deactivateLicense",
+        "kind": "mutation",
+        "file": "license/deactivate-license.gql",
+        "root_field": "deactivateLicense",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "deleteAccount",
+        "kind": "mutation",
+        "file": "delete-account.gql",
+        "root_field": "deleteAccount",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "deleteBlob",
+        "kind": "mutation",
+        "file": "blob-delete.gql",
+        "root_field": "deleteBlob",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId",
+          "key",
+          "permanently"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "deleteComment",
+        "kind": "mutation",
+        "file": "comment-delete.gql",
+        "root_field": "deleteComment",
+        "group": "comments",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "deleteReply",
+        "kind": "mutation",
+        "file": "comment-reply-delete.gql",
+        "root_field": "deleteReply",
+        "group": "comments",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "deleteUser",
+        "kind": "mutation",
+        "file": "admin/delete-user.gql",
+        "root_field": "deleteUser",
+        "group": "graphql",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "deleteWorkspace",
+        "kind": "mutation",
+        "file": "delete-workspace.gql",
+        "root_field": "deleteWorkspace",
+        "group": "graphql",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "deleteWorkspaceByokConfig",
+        "kind": "mutation",
+        "file": "workspace-byok-config-delete.gql",
+        "root_field": "deleteWorkspaceByokConfig",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "disableUser",
+        "kind": "mutation",
+        "file": "admin/disable-user.gql",
+        "root_field": "banUser",
+        "group": "graphql",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "enableUser",
+        "kind": "mutation",
+        "file": "admin/enable-user.gql",
+        "root_field": "enableUser",
+        "group": "graphql",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "forkCopilotSession",
+        "kind": "mutation",
+        "file": "copilot-session-fork.gql",
+        "root_field": "forkCopilotSession",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "generateLicenseKey",
+        "kind": "mutation",
+        "file": "generate-license-key.gql",
+        "root_field": "generateLicenseKey",
+        "group": "graphql",
+        "variables_declared": [
+          "sessionId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "generateUserAccessToken",
+        "kind": "mutation",
+        "file": "access-token/create.gql",
+        "root_field": "generateUserAccessToken",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "grantDocUserRoles",
+        "kind": "mutation",
+        "file": "grant-doc-user-roles.gql",
+        "root_field": "grantDocUserRoles",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "grantWorkspaceTeamMember",
+        "kind": "mutation",
+        "file": "workspace-team-grant.gql",
+        "root_field": "grantMember",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "userId",
+          "permission"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "installLicense",
+        "kind": "mutation",
+        "file": "license/install-license.gql",
+        "root_field": "installLicense",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId",
+          "license"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "inviteByEmails",
+        "kind": "mutation",
+        "file": "workspace-intive-by-emails.gql",
+        "root_field": "inviteMembers",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "emails"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "leaveWorkspace",
+        "kind": "mutation",
+        "file": "leave-workspace.gql",
+        "root_field": "leaveWorkspace",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId",
+          "sendLeaveMail"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "linkCalDavAccount",
+        "kind": "mutation",
+        "file": "calendar/link-caldav-account.gql",
+        "root_field": "linkCalDAVAccount",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "linkCalendarAccount",
+        "kind": "mutation",
+        "file": "calendar/link-calendar-account.gql",
+        "root_field": "linkCalendarAccount",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "mentionUser",
+        "kind": "mutation",
+        "file": "mention-user.gql",
+        "root_field": "mentionUser",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "previewLicense",
+        "kind": "mutation",
+        "file": "license/preview-license.gql",
+        "root_field": "previewLicense",
+        "group": "graphql",
+        "variables_declared": [
+          "license"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "publishPage",
+        "kind": "mutation",
+        "file": "public-page.gql",
+        "root_field": "publishDoc",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId",
+          "pageId",
+          "mode"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "queueWorkspaceEmbedding",
+        "kind": "mutation",
+        "file": "copilot-context-workspace-queue.gql",
+        "root_field": "queueWorkspaceEmbedding",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "docId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "readAllNotifications",
+        "kind": "mutation",
+        "file": "read-all-notifications.gql",
+        "root_field": "readAllNotifications",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "readNotification",
+        "kind": "mutation",
+        "file": "read-notification.gql",
+        "root_field": "readNotification",
+        "group": "graphql",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "recoverDoc",
+        "kind": "mutation",
+        "file": "recover-doc.gql",
+        "root_field": "recoverDoc",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "timestamp"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "refreshSubscription",
+        "kind": "mutation",
+        "file": "subscription-refresh.gql",
+        "root_field": "refreshUserSubscriptions",
+        "group": "subscriptions",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "releaseDeletedBlobs",
+        "kind": "mutation",
+        "file": "blob-release-deleted.gql",
+        "root_field": "releaseDeletedBlobs",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "removeAvatar",
+        "kind": "mutation",
+        "file": "remove-avatar.gql",
+        "root_field": "removeAvatar",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "removeContextBlob",
+        "kind": "mutation",
+        "file": "copilot-context-blob-remove.gql",
+        "root_field": "removeContextBlob",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "removeContextCategory",
+        "kind": "mutation",
+        "file": "copilot-context-category-remove.gql",
+        "root_field": "removeContextCategory",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "removeContextDoc",
+        "kind": "mutation",
+        "file": "copilot-context-doc-remove.gql",
+        "root_field": "removeContextDoc",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "removeContextFile",
+        "kind": "mutation",
+        "file": "copilot-context-file-remove.gql",
+        "root_field": "removeContextFile",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "removeWorkspaceEmbeddingFiles",
+        "kind": "mutation",
+        "file": "copilot-workspace-file-remove.gql",
+        "root_field": "removeWorkspaceEmbeddingFiles",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "fileId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "removeWorkspaceEmbeddingIgnoredDocs",
+        "kind": "mutation",
+        "file": "copilot-workspace-ignored-docs-remove.gql",
+        "root_field": "updateWorkspaceEmbeddingIgnoredDocs",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "remove"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "reorderWorkspaceByokConfigs",
+        "kind": "mutation",
+        "file": "workspace-byok-config-reorder.gql",
+        "root_field": "reorderWorkspaceByokConfigs",
+        "group": "workspaces",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "requestApplySubscription",
+        "kind": "mutation",
+        "file": "subscription-request.gql",
+        "root_field": "requestApplySubscription",
+        "group": "subscriptions",
+        "variables_declared": [
+          "transactionId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "resolveComment",
+        "kind": "mutation",
+        "file": "comment-resolve.gql",
+        "root_field": "resolveComment",
+        "group": "comments",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "resumeSubscription",
+        "kind": "mutation",
+        "file": "resume-subscription.gql",
+        "root_field": "resumeSubscription",
+        "group": "graphql",
+        "variables_declared": [
+          "plan",
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "retryTranscriptTask",
+        "kind": "mutation",
+        "file": "copilot-transcript-task-retry.gql",
+        "root_field": "retryTranscriptTask",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "taskId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "revokeDocUserRoles",
+        "kind": "mutation",
+        "file": "revoke-doc-user-roles.gql",
+        "root_field": "revokeDocUserRoles",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "revokeInviteLink",
+        "kind": "mutation",
+        "file": "workspace-invite-revoke-link.gql",
+        "root_field": "revokeInviteLink",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "revokeMemberPermission",
+        "kind": "mutation",
+        "file": "revoke-member-permission.gql",
+        "root_field": "revokeMember",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId",
+          "userId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "revokePublicPage",
+        "kind": "mutation",
+        "file": "revoke-public-page.gql",
+        "root_field": "revokePublicDoc",
+        "group": "graphql",
+        "variables_declared": [
+          "workspaceId",
+          "pageId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "revokeUserAccessToken",
+        "kind": "mutation",
+        "file": "access-token/revoke.gql",
+        "root_field": "revokeUserAccessToken",
+        "group": "graphql",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "sendChangeEmail",
+        "kind": "mutation",
+        "file": "send-change-email.gql",
+        "root_field": "sendChangeEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "callbackUrl"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "sendChangePasswordEmail",
+        "kind": "mutation",
+        "file": "send-change-password-email.gql",
+        "root_field": "sendChangePasswordEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "callbackUrl"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "sendSetPasswordEmail",
+        "kind": "mutation",
+        "file": "send-set-password-email.gql",
+        "root_field": "sendSetPasswordEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "callbackUrl"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "sendTestEmail",
+        "kind": "mutation",
+        "file": "admin/send-test-email.gql",
+        "root_field": "sendTestEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "name",
+          "host",
+          "port",
+          "sender",
+          "username",
+          "password",
+          "ignoreTLS"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "sendVerifyChangeEmail",
+        "kind": "mutation",
+        "file": "send-verify-change-email.gql",
+        "root_field": "sendVerifyChangeEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "token",
+          "email",
+          "callbackUrl"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "sendVerifyEmail",
+        "kind": "mutation",
+        "file": "send-verify-email.gql",
+        "root_field": "sendVerifyEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "callbackUrl"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "setBlob",
+        "kind": "mutation",
+        "file": "blob-set.gql",
+        "root_field": "setBlob",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId",
+          "blob"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "setEnableAi",
+        "kind": "mutation",
+        "file": "workspace-enable-ai.gql",
+        "root_field": "updateWorkspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "enableAi"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "setEnableDocEmbedding",
+        "kind": "mutation",
+        "file": "workspace-enable-doc-embedding.gql",
+        "root_field": "updateWorkspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "enableDocEmbedding"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "setEnableSharing",
+        "kind": "mutation",
+        "file": "workspace-enable-sharing.gql",
+        "root_field": "updateWorkspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "enableSharing"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "setEnableUrlPreview",
+        "kind": "mutation",
+        "file": "workspace-enable-url-preview.gql",
+        "root_field": "updateWorkspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "enableUrlPreview"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "setWorkspacePublicById",
+        "kind": "mutation",
+        "file": "set-workspace-public-by-id.gql",
+        "root_field": "updateWorkspace",
+        "group": "graphql",
+        "variables_declared": [
+          "id",
+          "public"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "settleTranscriptTask",
+        "kind": "mutation",
+        "file": "copilot-transcript-task-settle.gql",
+        "root_field": "settleTranscriptTask",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "taskId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "submitTranscriptTask",
+        "kind": "mutation",
+        "file": "copilot-transcript-task-submit.gql",
+        "root_field": "submitTranscriptTask",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "blobId",
+          "blob",
+          "blobs",
+          "input"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "testWorkspaceByokConfig",
+        "kind": "mutation",
+        "file": "workspace-byok-config-test.gql",
+        "root_field": "testWorkspaceByokConfig",
+        "group": "workspaces",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "unlinkCalendarAccount",
+        "kind": "mutation",
+        "file": "calendar/unlink-calendar-account.gql",
+        "root_field": "unlinkCalendarAccount",
+        "group": "graphql",
+        "variables_declared": [
+          "accountId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateAccount",
+        "kind": "mutation",
+        "file": "admin/update-account.gql",
+        "root_field": "updateUser",
+        "group": "graphql",
+        "variables_declared": [
+          "id",
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateAccountFeatures",
+        "kind": "mutation",
+        "file": "admin/update-account-features.gql",
+        "root_field": "updateUserFeatures",
+        "group": "graphql",
+        "variables_declared": [
+          "userId",
+          "features"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateAppConfig",
+        "kind": "mutation",
+        "file": "admin/update-config.gql",
+        "root_field": "updateAppConfig",
+        "group": "graphql",
+        "variables_declared": [
+          "updates"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateCalendarAccount",
+        "kind": "mutation",
+        "file": "calendar/update-calendar-account.gql",
+        "root_field": "updateCalendarAccount",
+        "group": "graphql",
+        "variables_declared": [
+          "accountId",
+          "refreshIntervalMinutes"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateComment",
+        "kind": "mutation",
+        "file": "comment-update.gql",
+        "root_field": "updateComment",
+        "group": "comments",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateCopilotSession",
+        "kind": "mutation",
+        "file": "copilot-session-update.gql",
+        "root_field": "updateCopilotSession",
+        "group": "copilots",
+        "variables_declared": [
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateDocDefaultRole",
+        "kind": "mutation",
+        "file": "update-doc-default-role.gql",
+        "root_field": "updateDocDefaultRole",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateDocUserRole",
+        "kind": "mutation",
+        "file": "update-doc-user-role.gql",
+        "root_field": "updateDocUserRole",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateReply",
+        "kind": "mutation",
+        "file": "comment-reply-update.gql",
+        "root_field": "updateReply",
+        "group": "comments",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateSubscription",
+        "kind": "mutation",
+        "file": "update-subscription-billing.gql",
+        "root_field": "updateSubscriptionRecurring",
+        "group": "graphql",
+        "variables_declared": [
+          "plan",
+          "recurring",
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateUserProfile",
+        "kind": "mutation",
+        "file": "update-user-profile.gql",
+        "root_field": "updateProfile",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateUserSettings",
+        "kind": "mutation",
+        "file": "update-user-settings.gql",
+        "root_field": "updateSettings",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "updateWorkspaceCalendars",
+        "kind": "mutation",
+        "file": "calendar/update-workspace-calendars.gql",
+        "root_field": "updateWorkspaceCalendars",
+        "group": "graphql",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "uploadAvatar",
+        "kind": "mutation",
+        "file": "upload-avatar.gql",
+        "root_field": "uploadAvatar",
+        "group": "graphql",
+        "variables_declared": [
+          "avatar"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "uploadCommentAttachment",
+        "kind": "mutation",
+        "file": "comment-upload-attachment.gql",
+        "root_field": "uploadCommentAttachment",
+        "group": "comments",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "attachment"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "upsertWorkspaceByokConfig",
+        "kind": "mutation",
+        "file": "workspace-byok-config-upsert.gql",
+        "root_field": "upsertWorkspaceByokConfig",
+        "group": "workspaces",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "verifyEmail",
+        "kind": "mutation",
+        "file": "verify-email.gql",
+        "root_field": "verifyEmail",
+        "group": "graphql",
+        "variables_declared": [
+          "token"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "adminAllSharedLinks",
+        "kind": "query",
+        "file": "admin/admin-all-shared-links.gql",
+        "root_field": "adminAllSharedLinks",
+        "group": "admins",
+        "variables_declared": [
+          "pagination",
+          "filter"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "adminDashboard",
+        "kind": "query",
+        "file": "admin/admin-dashboard.gql",
+        "root_field": "adminDashboard",
+        "group": "admins",
+        "variables_declared": [
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "adminServerConfig",
+        "kind": "query",
+        "file": "admin/admin-server-config.gql",
+        "root_field": "serverConfig",
+        "group": "admins",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "adminWorkspace",
+        "kind": "query",
+        "file": "admin/admin-workspace.gql",
+        "root_field": "adminWorkspace",
+        "group": "admins",
+        "variables_declared": [
+          "id",
+          "memberSkip",
+          "memberTake",
+          "memberQuery"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "adminWorkspaces",
+        "kind": "query",
+        "file": "admin/admin-workspaces.gql",
+        "root_field": "adminWorkspaces",
+        "group": "admins",
+        "variables_declared": [
+          "filter"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "adminWorkspacesCount",
+        "kind": "query",
+        "file": "admin/admin-workspaces.gql",
+        "root_field": "adminWorkspacesCount",
+        "group": "admins",
+        "variables_declared": [
+          "filter"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "appConfig",
+        "kind": "query",
+        "file": "admin/config.gql",
+        "root_field": "appConfig",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "calendarAccounts",
+        "kind": "query",
+        "file": "calendar/calendar-accounts.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "calendarEvents",
+        "kind": "query",
+        "file": "calendar/calendar-events.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "from",
+          "to"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "calendarProviders",
+        "kind": "query",
+        "file": "calendar/calendar-providers.gql",
+        "root_field": "serverConfig",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "copilotQuota",
+        "kind": "query",
+        "file": "copilot-quota.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "getAllWorkspaceEmbeddingIgnoredDocs",
+        "kind": "query",
+        "file": "copilot-workspace-ignored-docs-get-all.gql",
+        "root_field": "workspace",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getBlobUploadPartUrl",
+        "kind": "query",
+        "file": "blob-upload-part-url.gql",
+        "root_field": "workspace",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId",
+          "key",
+          "uploadId",
+          "partNumber"
+        ],
+        "uses_upload": true
+      },
+      {
+        "name": "getCopilotDocSessions",
+        "kind": "query",
+        "file": "copilot-history-list-doc-sessions.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "pagination",
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotHistories",
+        "kind": "query",
+        "file": "copilot-history-list.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "pagination",
+          "docId",
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotHistoryIds",
+        "kind": "query",
+        "file": "copilot-history-get-ids.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "pagination",
+          "docId",
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotLatestDocSession",
+        "kind": "query",
+        "file": "copilot-session-get-latest-doc.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "docId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotPinnedSessions",
+        "kind": "query",
+        "file": "copilot-history-list-pinned-session.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "messageOrder",
+          "withPrompt"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotRecentSessions",
+        "kind": "query",
+        "file": "copilot-session-list-recent.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "limit",
+          "offset"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotSession",
+        "kind": "query",
+        "file": "copilot-session-get.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "sessionId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotSessions",
+        "kind": "query",
+        "file": "copilot-sessions-get.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "pagination",
+          "docId",
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCopilotWorkspaceSessions",
+        "kind": "query",
+        "file": "copilot-history-list-workspace-sessions.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "pagination",
+          "options"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getCurrentUser",
+        "kind": "query",
+        "file": "get-current-user.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "getCurrentUserFeatures",
+        "kind": "query",
+        "file": "get-current-user-features.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "getDocCreatedByUpdatedByList",
+        "kind": "query",
+        "file": "get-doc-created-by-updated-by-list.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "pagination"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getDocLastAccessedMembers",
+        "kind": "query",
+        "file": "get-doc-last-accessed-members.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "pagination",
+          "query",
+          "includeTotal"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getDocPageAnalytics",
+        "kind": "query",
+        "file": "get-doc-page-analytics.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getDocRolePermissions",
+        "kind": "query",
+        "file": "doc-role-permissions.gql",
+        "root_field": "workspace",
+        "group": "docs",
+        "variables_declared": [
+          "workspaceId",
+          "docId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getDocSummary",
+        "kind": "query",
+        "file": "get-doc-summary.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "docId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getInviteInfo",
+        "kind": "query",
+        "file": "get-invite-info.gql",
+        "root_field": "getInviteInfo",
+        "group": "graphql",
+        "variables_declared": [
+          "inviteId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getInvoicesCount",
+        "kind": "query",
+        "file": "invoices-count.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "getLicense",
+        "kind": "query",
+        "file": "license/get-license.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getMemberCountByWorkspaceId",
+        "kind": "query",
+        "file": "get-member-count-by-workspace-id.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getPromptModels",
+        "kind": "query",
+        "file": "copilot-models-get.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "promptName"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getPublicUserById",
+        "kind": "query",
+        "file": "get-public-user-by-id.gql",
+        "root_field": "publicUserById",
+        "group": "graphql",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getRecentlyUpdatedDocs",
+        "kind": "query",
+        "file": "get-recently-update-docs.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "pagination"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getTranscriptTask",
+        "kind": "query",
+        "file": "copilot-transcript-task-get.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "taskId",
+          "blobId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getUser",
+        "kind": "query",
+        "file": "get-user.gql",
+        "root_field": "user",
+        "group": "users",
+        "variables_declared": [
+          "email"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getUserByEmail",
+        "kind": "query",
+        "file": "admin/get-user-by-email.gql",
+        "root_field": "userByEmail",
+        "group": "users",
+        "variables_declared": [
+          "email"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getUserFeatures",
+        "kind": "query",
+        "file": "get-user-features.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "getUserSettings",
+        "kind": "query",
+        "file": "get-user-settings.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspace",
+        "kind": "query",
+        "file": "get-workspace.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspaceEmbeddingFiles",
+        "kind": "query",
+        "file": "copilot-workspace-file-get.gql",
+        "root_field": "workspace",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "pagination"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspaceEmbeddingIgnoredDocs",
+        "kind": "query",
+        "file": "copilot-workspace-ignored-docs-get.gql",
+        "root_field": "workspace",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "pagination"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspacePageById",
+        "kind": "query",
+        "file": "get-workspace-page-by-id.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "pageId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspacePageMetaById",
+        "kind": "query",
+        "file": "get-workspace-page-meta.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "pageId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspacePublicById",
+        "kind": "query",
+        "file": "get-workspace-public-by-id.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspacePublicPages",
+        "kind": "query",
+        "file": "get-workspace-public-pages.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspaceRolePermissions",
+        "kind": "query",
+        "file": "workspace-role-permissions.gql",
+        "root_field": "workspaceRolePermissions",
+        "group": "workspaces",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspaceSubscription",
+        "kind": "query",
+        "file": "get-workspace-subscription.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "getWorkspaces",
+        "kind": "query",
+        "file": "get-workspaces.gql",
+        "root_field": "workspaces",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "indexerAggregate",
+        "kind": "query",
+        "file": "indexer-aggregate.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "indexerSearch",
+        "kind": "query",
+        "file": "indexer-search.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "indexerSearchDocs",
+        "kind": "query",
+        "file": "indexer-search-docs.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "input"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "invoices",
+        "kind": "query",
+        "file": "invoices.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [
+          "take",
+          "skip"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listBlobs",
+        "kind": "query",
+        "file": "blob-list.gql",
+        "root_field": "workspace",
+        "group": "blobs",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listCommentChanges",
+        "kind": "query",
+        "file": "comment-change-list.gql",
+        "root_field": "workspace",
+        "group": "comments",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "pagination"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listComments",
+        "kind": "query",
+        "file": "comment-list.gql",
+        "root_field": "workspace",
+        "group": "comments",
+        "variables_declared": [
+          "workspaceId",
+          "docId",
+          "pagination"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listContext",
+        "kind": "query",
+        "file": "copilot-context-list.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "sessionId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listContextObject",
+        "kind": "query",
+        "file": "copilot-context-list-object.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "workspaceId",
+          "sessionId",
+          "contextId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listHistory",
+        "kind": "query",
+        "file": "histories.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId",
+          "pageDocId",
+          "take",
+          "before"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listNotifications",
+        "kind": "query",
+        "file": "list-notifications.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [
+          "pagination"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "listUsers",
+        "kind": "query",
+        "file": "admin/list-users.gql",
+        "root_field": "users",
+        "group": "graphql",
+        "variables_declared": [
+          "filter"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "matchContext",
+        "kind": "query",
+        "file": "copilot-context-match-all.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "contextId",
+          "workspaceId",
+          "content",
+          "limit",
+          "scopedThreshold",
+          "threshold"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "matchFiles",
+        "kind": "query",
+        "file": "copilot-context-match-files.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "contextId",
+          "workspaceId",
+          "content",
+          "limit",
+          "scopedThreshold",
+          "threshold"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "matchWorkspaceDocs",
+        "kind": "query",
+        "file": "copilot-context-match-docs.gql",
+        "root_field": "currentUser",
+        "group": "copilots",
+        "variables_declared": [
+          "contextId",
+          "workspaceId",
+          "content",
+          "limit",
+          "scopedThreshold",
+          "threshold"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "oauthProviders",
+        "kind": "query",
+        "file": "get-oauth-providers.gql",
+        "root_field": "serverConfig",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "prices",
+        "kind": "query",
+        "file": "prices.gql",
+        "root_field": "prices",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "quota",
+        "kind": "query",
+        "file": "quota.gql",
+        "root_field": "currentUser",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "serverConfig",
+        "kind": "query",
+        "file": "server-config.gql",
+        "root_field": "serverConfig",
+        "group": "graphql",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "subscription",
+        "kind": "query",
+        "file": "subscription.gql",
+        "root_field": "currentUser",
+        "group": "subscriptions",
+        "variables_declared": [],
+        "uses_upload": false
+      },
+      {
+        "name": "validateConfig",
+        "kind": "query",
+        "file": "admin/validate-config.gql",
+        "root_field": "validateAppConfig",
+        "group": "graphql",
+        "variables_declared": [
+          "updates"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "workspaceBlobQuota",
+        "kind": "query",
+        "file": "workspace-blob-quota.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "workspaceByokSettings",
+        "kind": "query",
+        "file": "workspace-byok-settings.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "id",
+          "from",
+          "to"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "workspaceCalendars",
+        "kind": "query",
+        "file": "calendar/workspace-calendars.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "workspaceId"
+        ],
+        "uses_upload": false
+      },
+      {
+        "name": "workspaceInvoices",
+        "kind": "query",
+        "file": "workspace-invoices.gql",
+        "root_field": "workspace",
+        "group": "workspaces",
+        "variables_declared": [
+          "take",
+          "skip",
+          "workspaceId"
+        ],
+        "uses_upload": false
+      }
+    ],
+    "fragments": [
+      {
+        "name": "CopilotChatHistory",
+        "file": "fragments/copilot-chat-history.gql"
+      },
+      {
+        "name": "CredentialsRequirements",
+        "file": "fragments/credentials-requirement.gql"
+      },
+      {
+        "name": "PaginatedCopilotChats",
+        "file": "fragments/paginated-copilot-chats.gql"
+      },
+      {
+        "name": "PasswordLimits",
+        "file": "fragments/password-limits.gql"
+      },
+      {
+        "name": "licenseBody",
+        "file": "license/license-body.gql"
+      }
+    ]
+  },
+  "printing_press": {
+    "spec": "specs\\affine\\affine-graphql.yaml",
+    "base_url": "https://qtz-affine.fly.dev",
+    "graphql_endpoint_path": "/graphql",
+    "auth_env": "AFFINE_TOKEN"
+  }
+}
