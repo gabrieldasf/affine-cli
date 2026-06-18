@@ -12,8 +12,6 @@ import (
 	"affine-pp-cli/internal/yjs"
 )
 
-const defaultWorkspaceID = "727cc066-a25e-4560-b68d-414b67cbc5c8"
-
 type CardImageOptions struct {
 	WorkspaceID string
 	DocID       string
@@ -35,7 +33,7 @@ type CardImageResult struct {
 
 func SetCardImage(cfg *config.Config, opts CardImageOptions) (CardImageResult, error) {
 	if opts.WorkspaceID == "" {
-		opts.WorkspaceID = defaultWorkspaceID
+		return CardImageResult{}, fmt.Errorf("--workspace is required")
 	}
 	if opts.DocID == "" || opts.CardID == "" || opts.SourceID == "" {
 		return CardImageResult{}, fmt.Errorf("--doc, --card and --source-id are required")

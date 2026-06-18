@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	"affine-pp-cli/internal/cliutil"
 	"affine-pp-cli/internal/config"
 	"affine-pp-cli/internal/socketio"
 	"affine-pp-cli/internal/yjs"
@@ -59,7 +60,7 @@ type DocAuditNoteModeStats struct {
 
 func AuditDoc(cfg *config.Config, opts DocAuditOptions) (DocAuditResult, error) {
 	if opts.WorkspaceID == "" {
-		opts.WorkspaceID = defaultWorkspaceID
+		return DocAuditResult{}, fmt.Errorf("--workspace is required")
 	}
 	if opts.DocID == "" {
 		return DocAuditResult{}, fmt.Errorf("--doc is required")
@@ -207,11 +208,16 @@ func auditBlocks(cfg *config.Config, engine *yjs.Engine, opts DocAuditOptions) (
 		if cfg.AuthHeader() != "" {
 			req.Header.Set("Authorization", cfg.AuthHeader())
 		}
+		limiter := cliutil.NewAdaptiveLimiter(1)
+		limiter.Wait()
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return nil, err
 		}
 		defer res.Body.Close()
+		if res.StatusCode == http.StatusTooManyRequests {
+			return nil, fmt.Errorf("snapshot %s: rate limited: %s", opts.Timestamp, res.Status)
+		}
 		if res.StatusCode < 200 || res.StatusCode > 299 {
 			body, _ := io.ReadAll(io.LimitReader(res.Body, 512))
 			return nil, fmt.Errorf("snapshot %s: %s %s", opts.Timestamp, res.Status, strings.TrimSpace(string(body)))

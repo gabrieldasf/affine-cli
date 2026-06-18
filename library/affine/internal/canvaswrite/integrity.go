@@ -62,7 +62,7 @@ type DocRepairResult struct {
 
 func CheckDocIntegrity(cfg *config.Config, opts DocIntegrityOptions) (DocIntegrityResult, error) {
 	if opts.WorkspaceID == "" {
-		opts.WorkspaceID = defaultWorkspaceID
+		return DocIntegrityResult{}, fmt.Errorf("--workspace is required")
 	}
 	if opts.DocID == "" && opts.SnapshotFile == "" {
 		return DocIntegrityResult{}, fmt.Errorf("--doc is required")
@@ -159,7 +159,7 @@ func EnsureBlocksIntegrity(docID string, blocks map[string]map[string]any, stage
 
 func RepairDoc(cfg *config.Config, opts DocRepairOptions) (DocRepairResult, error) {
 	if opts.WorkspaceID == "" {
-		opts.WorkspaceID = defaultWorkspaceID
+		return DocRepairResult{}, fmt.Errorf("--workspace is required")
 	}
 	if opts.DocID == "" {
 		return DocRepairResult{}, fmt.Errorf("--doc is required")

@@ -23,7 +23,7 @@ type BlockInspectResult struct {
 
 func InspectBlock(cfg *config.Config, opts BlockInspectOptions) (BlockInspectResult, error) {
 	if opts.WorkspaceID == "" {
-		opts.WorkspaceID = defaultWorkspaceID
+		return BlockInspectResult{}, fmt.Errorf("--workspace is required")
 	}
 	if opts.DocID == "" || opts.BlockID == "" {
 		return BlockInspectResult{}, fmt.Errorf("--doc and --block are required")

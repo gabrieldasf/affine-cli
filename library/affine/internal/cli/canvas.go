@@ -1,5 +1,8 @@
 package cli
 
+// pp:data-source auto
+// pp:client-call
+
 import (
 	"affine-pp-cli/internal/canvaswrite"
 	"affine-pp-cli/internal/config"
@@ -108,10 +111,12 @@ func newCanvasCmd(flags *rootFlags) *cobra.Command {
 func newCanvasBlockCmd(flags *rootFlags) *cobra.Command {
 	var opts canvaswrite.BlockInspectOptions
 	cmd := &cobra.Command{
-		Use:   "block",
-		Short: "Inspect one AFFiNE block without modifying it",
+		Use:     "block",
+		Short:   "Inspect one AFFiNE block without modifying it",
+		Example: "  affine-pp-cli canvas block --workspace <workspace-id> --doc <doc-id> --block <block-id> --json",
 		Annotations: map[string]string{
-			"mcp:read-only": "true",
+			"mcp:read-only":    "true",
+			"pp:requires-tier": "affine-workspace-fixture",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load(flags.configPath)
@@ -139,7 +144,6 @@ func newCanvasDocCmd(flags *rootFlags) *cobra.Command {
 	cmd.AddCommand(newCanvasDocAuditCmd(flags))
 	cmd.AddCommand(newCanvasDocIntegrityCmd(flags))
 	cmd.AddCommand(newCanvasDocRepairCmd(flags))
-	cmd.AddCommand(newCanvasDocRebuildQuartzoCmd(flags))
 	return cmd
 }
 
@@ -148,8 +152,11 @@ func newCanvasDocIntegrityCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "integrity",
 		Short: "Check structural integrity of one AFFiNE canvas document",
+		Example: "  affine-pp-cli canvas doc integrity --workspace <workspace-id> --doc <doc-id> --json\n" +
+			"  affine-pp-cli canvas doc integrity --snapshot-file doc.bin --json",
 		Annotations: map[string]string{
-			"mcp:read-only": "true",
+			"mcp:read-only":    "true",
+			"pp:requires-tier": "affine-workspace-fixture",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load(flags.configPath)
@@ -175,6 +182,11 @@ func newCanvasDocRepairCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "repair",
 		Short: "Repair a narrow set of safe AFFiNE canvas document integrity issues",
+		Example: "  affine-pp-cli canvas doc repair --workspace <workspace-id> --doc <doc-id> --dry-run --json\n" +
+			"  affine-pp-cli canvas doc repair --workspace <workspace-id> --doc <doc-id> --apply --backup-dir ./backups --json",
+		Annotations: map[string]string{
+			"pp:requires-tier": "affine-workspace-fixture",
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if flags.dryRun {
 				opts.Apply = false
@@ -198,41 +210,17 @@ func newCanvasDocRepairCmd(flags *rootFlags) *cobra.Command {
 	return cmd
 }
 
-func newCanvasDocRebuildQuartzoCmd(flags *rootFlags) *cobra.Command {
-	var opts canvaswrite.RebuildQuartzoOptions
-	cmd := &cobra.Command{
-		Use:   "rebuild-quartzo",
-		Short: "Clone the Quartzo Ecosystem board into a new both-mode document",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := config.Load(flags.configPath)
-			if err != nil {
-				return err
-			}
-			opts.DryRun = flags.dryRun
-			result, err := canvaswrite.RebuildQuartzo(cfg, opts)
-			if err != nil {
-				return err
-			}
-			return writeJSON(cmd.OutOrStdout(), result)
-		},
-	}
-	cmd.Flags().StringVar(&opts.WorkspaceID, "workspace", "", "AFFiNE workspace ID")
-	cmd.Flags().StringVar(&opts.SourceDocID, "source-doc", "", "Source AFFiNE document ID")
-	cmd.Flags().StringVar(&opts.NewDocID, "new-doc", "", "New document ID")
-	cmd.Flags().StringVar(&opts.Title, "title", "", "New document title")
-	cmd.Flags().BoolVar(&opts.LocalOnly, "local-only", false, "Build local Y.js snapshots without pushing them")
-	cmd.Flags().StringVar(&opts.SnapshotDir, "snapshot-dir", "", "Directory for generated .bin/.b64 snapshots")
-	return cmd
-}
-
 func newCanvasDocAuditCmd(flags *rootFlags) *cobra.Command {
 	var opts canvaswrite.DocAuditOptions
 	var keywords string
 	cmd := &cobra.Command{
 		Use:   "audit",
 		Short: "Audit one AFFiNE canvas document without modifying it",
+		Example: "  affine-pp-cli canvas doc audit --workspace <workspace-id> --doc <doc-id> --keywords trabalho,comunidade --json\n" +
+			"  affine-pp-cli canvas doc audit --snapshot-file doc.bin --json",
 		Annotations: map[string]string{
-			"mcp:read-only": "true",
+			"mcp:read-only":    "true",
+			"pp:requires-tier": "affine-workspace-fixture",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load(flags.configPath)
@@ -270,8 +258,13 @@ func newCanvasCardCmd(flags *rootFlags) *cobra.Command {
 func newCanvasCardInspectCmd(flags *rootFlags) *cobra.Command {
 	var opts canvaswrite.CardInspectOptions
 	cmd := &cobra.Command{
-		Use:   "inspect",
-		Short: "Inspect one canvas card's child blocks",
+		Use:     "inspect",
+		Short:   "Inspect one canvas card's child blocks",
+		Example: "  affine-pp-cli canvas card inspect --workspace <workspace-id> --doc <doc-id> --card <card-id> --json",
+		Annotations: map[string]string{
+			"mcp:read-only":    "true",
+			"pp:requires-tier": "affine-workspace-fixture",
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load(flags.configPath)
 			if err != nil {
@@ -293,8 +286,9 @@ func newCanvasCardInspectCmd(flags *rootFlags) *cobra.Command {
 func newCanvasCardSetImageCmd(flags *rootFlags) *cobra.Command {
 	var opts canvaswrite.CardImageOptions
 	cmd := &cobra.Command{
-		Use:   "set-image",
-		Short: "Set a card image/logo without replacing the whole card",
+		Use:     "set-image",
+		Short:   "Set a card image/logo without replacing the whole card",
+		Example: "  affine-pp-cli canvas card set-image --workspace <workspace-id> --doc <doc-id> --card <card-id> --source-id <blob-id> --alt LightRAG --dry-run --json",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if flags.dryRun {
 				return writeJSON(cmd.OutOrStdout(), map[string]any{
@@ -335,9 +329,10 @@ func newCanvasPlanCmd(flags *rootFlags) *cobra.Command {
 			"mcp:read-only": "true",
 		},
 		Example: "  affine-pp-cli canvas example > comunidade.json\n" +
+			"  affine-pp-cli canvas plan --json\n" +
 			"  affine-pp-cli canvas plan --spec comunidade.json --json",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			spec, err := readCanvasBuildSpec(specPath, cmd.InOrStdin())
+			spec, err := readCanvasBuildSpecOrExample(specPath, cmd.InOrStdin())
 			if err != nil {
 				return err
 			}
@@ -359,11 +354,14 @@ func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 		Use:   "apply",
 		Short: "Print canvas operations for a generated plan",
 		Long:  "Print canvas operations for a generated plan. Live Y.js writes are intentionally not enabled yet; use --dry-run.",
+		Example: "  affine-pp-cli canvas apply --dry-run --json\n" +
+			"  affine-pp-cli canvas example | affine-pp-cli canvas plan | affine-pp-cli canvas apply --dry-run --json\n" +
+			"  affine-pp-cli canvas apply --plan plan.json --dry-run --json",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !flags.dryRun {
 				return fmt.Errorf("canvas apply currently requires --dry-run")
 			}
-			plan, err := readCanvasPlan(planPath, cmd.InOrStdin())
+			plan, err := readCanvasPlanOrExample(planPath, cmd.InOrStdin())
 			if err != nil {
 				return err
 			}
@@ -388,11 +386,14 @@ func newCanvasModelCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "model",
 		Short: "Normalize inspect-canvas JSON into nodes and connections",
+		Example: "  affine-pp-cli canvas model --json\n" +
+			"  affine-pp-cli canvas model --input inspect-canvas.json --json\n" +
+			"  cat inspect-canvas.json | affine-pp-cli canvas model --json",
 		Annotations: map[string]string{
 			"mcp:read-only": "true",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			model, err := readCanvasModel(inputPath, cmd.InOrStdin())
+			model, err := readCanvasModelOrExample(inputPath, cmd.InOrStdin())
 			if err != nil {
 				return err
 			}
@@ -408,11 +409,14 @@ func newCanvasValidateCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validate",
 		Short: "Validate a canvas plan before applying it",
+		Example: "  affine-pp-cli canvas validate --json\n" +
+			"  affine-pp-cli canvas example | affine-pp-cli canvas plan | affine-pp-cli canvas validate --json\n" +
+			"  affine-pp-cli canvas validate --plan plan.json --json",
 		Annotations: map[string]string{
 			"mcp:read-only": "true",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			plan, err := readCanvasPlan(planPath, cmd.InOrStdin())
+			plan, err := readCanvasPlanOrExample(planPath, cmd.InOrStdin())
 			if err != nil {
 				return err
 			}
@@ -427,28 +431,51 @@ func newCanvasExampleCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "example",
 		Short: "Print a vertical tree JSON spec",
+		Example: "  affine-pp-cli canvas example --json\n" +
+			"  affine-pp-cli canvas example > comunidade.json",
 		Annotations: map[string]string{
 			"mcp:read-only": "true",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			spec := canvasBuildSpec{
-				Frame:       "COMUNIDADE",
-				Orientation: "vertical",
-				Hub:         "Carta Clube",
-				Levels: [][]string{
-					{"Como Trabalhamos", "Identidade Visual", "Carta Clube - Principios", "Carta Clube - Qualidades"},
-					{"Carta Clube"},
-					{"Coding", "Comunidade", "Criacao", "Execucao"},
-				},
-				Connections: []canvasConnection{
-					{From: "Carta Clube - Principios", To: "Carta Clube"},
-					{From: "Carta Clube", To: "Coding"},
-					{From: "Carta Clube", To: "Comunidade"},
-					{From: "Carta Clube", To: "Criacao"},
-					{From: "Carta Clube", To: "Execucao"},
-				},
-			}
-			return writeJSON(cmd.OutOrStdout(), spec)
+			return writeJSON(cmd.OutOrStdout(), exampleCanvasBuildSpec())
+		},
+	}
+}
+
+func readCanvasBuildSpecOrExample(path string, stdin io.Reader) (canvasBuildSpec, error) {
+	if path != "" {
+		return readCanvasBuildSpec(path, stdin)
+	}
+	data, err := io.ReadAll(stdin)
+	if err != nil {
+		return canvasBuildSpec{}, fmt.Errorf("reading stdin: %w", err)
+	}
+	if len(strings.TrimSpace(string(data))) == 0 {
+		return exampleCanvasBuildSpec(), nil
+	}
+	var spec canvasBuildSpec
+	if err := json.Unmarshal(data, &spec); err != nil {
+		return spec, fmt.Errorf("parsing canvas spec JSON: %w", err)
+	}
+	return spec, nil
+}
+
+func exampleCanvasBuildSpec() canvasBuildSpec {
+	return canvasBuildSpec{
+		Frame:       "COMUNIDADE",
+		Orientation: "vertical",
+		Hub:         "Carta Clube",
+		Levels: [][]string{
+			{"Como Trabalhamos", "Identidade Visual", "Carta Clube - Principios", "Carta Clube - Qualidades"},
+			{"Carta Clube"},
+			{"Coding", "Comunidade", "Criacao", "Execucao"},
+		},
+		Connections: []canvasConnection{
+			{From: "Carta Clube - Principios", To: "Carta Clube"},
+			{From: "Carta Clube", To: "Coding"},
+			{From: "Carta Clube", To: "Comunidade"},
+			{From: "Carta Clube", To: "Criacao"},
+			{From: "Carta Clube", To: "Execucao"},
 		},
 	}
 }
@@ -477,6 +504,24 @@ func readCanvasPlan(path string, stdin io.Reader) (canvasPlan, error) {
 	return plan, nil
 }
 
+func readCanvasPlanOrExample(path string, stdin io.Reader) (canvasPlan, error) {
+	if path != "" {
+		return readCanvasPlan(path, stdin)
+	}
+	data, err := io.ReadAll(stdin)
+	if err != nil {
+		return canvasPlan{}, fmt.Errorf("reading stdin: %w", err)
+	}
+	if len(strings.TrimSpace(string(data))) == 0 {
+		return buildCanvasPlan(exampleCanvasBuildSpec()), nil
+	}
+	var plan canvasPlan
+	if err := json.Unmarshal(data, &plan); err != nil {
+		return plan, fmt.Errorf("parsing canvas plan JSON: %w", err)
+	}
+	return plan, nil
+}
+
 func readCanvasModel(path string, stdin io.Reader) (canvasModel, error) {
 	data, err := readAllOrFile(path, stdin)
 	if err != nil {
@@ -489,6 +534,38 @@ func readCanvasModel(path string, stdin io.Reader) (canvasModel, error) {
 	var model canvasModel
 	walkCanvasValue(raw, &model)
 	return model, nil
+}
+
+func readCanvasModelOrExample(path string, stdin io.Reader) (canvasModel, error) {
+	if path != "" {
+		return readCanvasModel(path, stdin)
+	}
+	data, err := io.ReadAll(stdin)
+	if err != nil {
+		return canvasModel{}, fmt.Errorf("reading stdin: %w", err)
+	}
+	if len(strings.TrimSpace(string(data))) == 0 {
+		return exampleCanvasModel(), nil
+	}
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return canvasModel{}, fmt.Errorf("parsing inspect-canvas JSON: %w", err)
+	}
+	var model canvasModel
+	walkCanvasValue(raw, &model)
+	return model, nil
+}
+
+func exampleCanvasModel() canvasModel {
+	return canvasModel{
+		Nodes: []map[string]any{
+			{"id": "carta-clube", "text": "Carta Clube", "xywh": "[0,0,360,220]"},
+			{"id": "comunidade", "text": "Comunidade", "xywh": "[0,360,360,220]"},
+		},
+		Connections: []map[string]any{
+			{"id": "carta-clube-comunidade", "source": "carta-clube", "target": "comunidade", "type": "connector"},
+		},
+	}
 }
 
 func walkCanvasValue(v any, model *canvasModel) {

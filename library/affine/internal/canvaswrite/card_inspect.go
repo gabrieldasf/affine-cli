@@ -31,7 +31,7 @@ type CardInspectResult struct {
 
 func InspectCard(cfg *config.Config, opts CardInspectOptions) (CardInspectResult, error) {
 	if opts.WorkspaceID == "" {
-		opts.WorkspaceID = defaultWorkspaceID
+		return CardInspectResult{}, fmt.Errorf("--workspace is required")
 	}
 	if opts.DocID == "" || opts.CardID == "" {
 		return CardInspectResult{}, fmt.Errorf("--doc and --card are required")

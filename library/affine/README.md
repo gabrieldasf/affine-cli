@@ -154,6 +154,66 @@ This checks your configuration and credentials.
 affine-pp-cli admins admin-all-shared-links --operation-name example-resource
 ```
 
+
+## Unique Features
+
+These capabilities aren't available in any other tool for this API.
+
+### Canvas operations
+- **`canvas plan`** — Builds a deterministic AFFiNE canvas card layout from a compact JSON tree spec.
+
+  _Use this before applying or reviewing a new canvas structure._
+
+  ```bash
+  affine-pp-cli canvas plan --json
+  ```
+- **`canvas model`** — Normalizes AFFiNE canvas JSON into explicit nodes and connectors.
+
+  _Use this when comparing or auditing canvas structure._
+
+  ```bash
+  affine-pp-cli canvas model --json
+  ```
+
+### Canvas safety
+- **`canvas validate`** — Checks planned canvas nodes and connectors for invalid geometry and orphaned links.
+
+  _Use this before applying generated canvas plans._
+
+  ```bash
+  affine-pp-cli canvas validate --json
+  ```
+- **`canvas apply`** — Converts a canvas plan into explicit dry-run operations without enabling live Y.js writes.
+
+  _Use this to inspect the exact operations a plan would perform._
+
+  ```bash
+  affine-pp-cli canvas apply --dry-run --json
+  ```
+
+### Canvas repair
+- **`canvas card set-image`** — Patches an existing AFFiNE canvas card image/logo while preserving card identity and text.
+
+  _Use this when a visual card asset needs to change without rebuilding the board._
+
+  ```bash
+  affine-pp-cli canvas card set-image --workspace <workspace-id> --doc <doc-id> --card <card-id> --source-id <blob-id> --alt LightRAG --dry-run --json
+  ```
+- **`canvas doc integrity`** — Checks AFFiNE canvas document snapshots for structural issues such as missing children maps.
+
+  _Use this before repairing a canvas that renders incomplete content._
+
+  ```bash
+  affine-pp-cli canvas doc integrity --snapshot-file doc.bin --json
+  ```
+- **`canvas doc repair`** — Repairs a narrow set of AFFiNE canvas integrity issues with dry-run and backup controls.
+
+  _Use this only after integrity diagnostics identify a supported repair._
+
+  ```bash
+  affine-pp-cli canvas doc repair --workspace <workspace-id> --doc <doc-id> --dry-run --json
+  ```
+
 ## Usage
 
 Run `affine-pp-cli --help` for the full command reference and flag list.
@@ -439,7 +499,7 @@ Verifies configuration, credentials, and connectivity to the API.
 
 ## Configuration
 
-Config file: `~/.config/affine-cli-v2/config.toml`
+Config file: `~/.config/affine-pp-cli/config.toml`
 
 Static request headers can be configured under `headers`; per-command header overrides take precedence.
 

@@ -64,10 +64,13 @@
   },
   "wiring_check": {
     "command_tree": {
-      "defined": 216,
-      "registered": 216
+      "defined": 231,
+      "registered": 231
     },
     "config_consistency": {
+      "read_fields": [
+        "Authorization"
+      ],
       "consistent": true
     },
     "workflow_completeness": {
@@ -78,9 +81,8 @@
     }
   },
   "novel_features_check": {
-    "planned": 0,
-    "found": 0,
-    "skipped": true
+    "planned": 7,
+    "found": 7
   },
   "mcp_surface_parity": {
     "state": "runtime_walking",
@@ -88,22 +90,24 @@
     "detail": "MCP surface mirrors the Cobra tree at runtime"
   },
   "reimplementation_check": {
-    "checked": 0,
+    "checked": 7,
     "exempted_via_store": 0,
-    "skipped": true
+    "exempted_via_client_directive": 7
   },
   "source_client_check": {
-    "checked": 0,
-    "skipped": true
+    "checked": 9
   },
   "print_json_filtered_check": {
-    "checked": 209
+    "checked": 210
   },
   "test_presence": {
-    "checked": 0
+    "checked": 3,
+    "thin_tests": [
+      "socketio (1 test funcs)"
+    ]
   },
   "naming_check": {
-    "checked": 209
+    "checked": 210
   },
   "sync_param_drop_check": {
     "checked": 0,

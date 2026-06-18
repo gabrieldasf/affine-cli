@@ -144,6 +144,15 @@ func newRootCmd(flags *rootFlags) *cobra.Command {
 		Short: `Operate AFFiNE GraphQL from the terminal.`,
 		Long: `Operate AFFiNE GraphQL from the terminal.
 
+Highlights (not in the official API docs):
+  • canvas plan   Builds a deterministic AFFiNE canvas card layout from a compact JSON tree spec.
+  • canvas model   Normalizes AFFiNE canvas JSON into explicit nodes and connectors.
+  • canvas validate   Checks planned canvas nodes and connectors for invalid geometry and orphaned links.
+  • canvas apply   Converts a canvas plan into explicit dry-run operations without enabling live Y.js writes.
+  • canvas card set-image   Patches an existing AFFiNE canvas card image/logo while preserving card identity and text.
+  • canvas doc integrity   Checks AFFiNE canvas document snapshots for structural issues such as missing children maps.
+  • canvas doc repair   Repairs a narrow set of AFFiNE canvas integrity issues with dry-run and backup controls.
+
 Add --agent to any command for JSON output + non-interactive mode.
 Run 'affine-pp-cli doctor' to verify auth and connectivity.`,
 		SilenceUsage: true,
