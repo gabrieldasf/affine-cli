@@ -11,9 +11,14 @@ catalog/specs/*.graphql
 /refactor/artifacts/
 /tests/artifacts/perf/
 /cli-printing-press
+/cli-printing-press.exe
 /printing-press
 /press-auth
-library/
+/library/*
+!/library/affine/
+!/library/affine/**
+/library/affine/affine.exe
+/library/affine/build/
 dist/
 claude-upgrade-progress.json
 
