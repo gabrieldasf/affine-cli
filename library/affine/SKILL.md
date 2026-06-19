@@ -51,6 +51,13 @@ These capabilities aren't available in any other tool for this API.
   ```bash
   affine-pp-cli canvas plan --json
   ```
+- **`canvas search`** — Finds AFFiNE canvas blocks, cards, and connectors by text, ID, flavour, type, display mode, geometry, source mode, and connector endpoints.
+
+  _Use this to select exact canvas entities before diffing or planning changes._
+
+  ```bash
+  affine-pp-cli canvas search --snapshot-file doc.bin --text roadmap --json
+  ```
 - **`canvas model`** — Normalizes AFFiNE canvas JSON into explicit nodes and connectors.
 
   _Use this when comparing or auditing canvas structure._

@@ -99,12 +99,54 @@ func newCanvasCmd(flags *rootFlags) *cobra.Command {
 	}
 	cmd.AddCommand(newCanvasPlanCmd(flags))
 	cmd.AddCommand(newCanvasApplyCmd(flags))
+	cmd.AddCommand(newCanvasSearchCmd(flags))
 	cmd.AddCommand(newCanvasModelCmd(flags))
 	cmd.AddCommand(newCanvasValidateCmd(flags))
 	cmd.AddCommand(newCanvasExampleCmd())
 	cmd.AddCommand(newCanvasCardCmd(flags))
 	cmd.AddCommand(newCanvasDocCmd(flags))
 	cmd.AddCommand(newCanvasBlockCmd(flags))
+	return cmd
+}
+
+func newCanvasSearchCmd(flags *rootFlags) *cobra.Command {
+	var opts canvaswrite.SearchOptions
+	cmd := &cobra.Command{
+		Use:   "search",
+		Short: "Search AFFiNE canvas blocks, cards, and connectors",
+		Example: "  affine-pp-cli canvas search --snapshot-file doc.bin --text roadmap --json\n" +
+			"  affine-pp-cli canvas search --workspace <workspace-id> --doc <doc-id> --flavour affine:note --json",
+		Annotations: map[string]string{
+			"mcp:read-only":    "true",
+			"pp:requires-tier": "affine-workspace-fixture",
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load(flags.configPath)
+			if err != nil {
+				return err
+			}
+			result, err := canvaswrite.SearchDoc(cfg, opts)
+			if err != nil {
+				return err
+			}
+			return writeJSON(cmd.OutOrStdout(), result)
+		},
+	}
+	cmd.Flags().StringVar(&opts.WorkspaceID, "workspace", "", "AFFiNE workspace ID")
+	cmd.Flags().StringVar(&opts.DocID, "doc", "", "AFFiNE document ID")
+	cmd.Flags().StringVar(&opts.SnapshotFile, "snapshot-file", "", "Local AFFiNE Y.js snapshot file to search")
+	cmd.Flags().StringVar(&opts.Timestamp, "timestamp", "", "AFFiNE history timestamp to search")
+	cmd.Flags().StringVar(&opts.Text, "text", "", "Case-insensitive text substring")
+	cmd.Flags().StringVar(&opts.ID, "id", "", "Exact block ID")
+	cmd.Flags().StringVar(&opts.Flavour, "flavour", "", "Exact sys:flavour value")
+	cmd.Flags().StringVar(&opts.Type, "type", "", "Exact sys:type value")
+	cmd.Flags().StringVar(&opts.DisplayMode, "display-mode", "", "Exact note display mode")
+	cmd.Flags().StringVar(&opts.SourceMode, "source-mode", "", "Source mode filter: live, snapshot, or history")
+	cmd.Flags().StringVar(&opts.Bounds, "bounds", "", "Rectangle filter as x,y,w,h")
+	cmd.Flags().StringVar(&opts.ConnectorFrom, "from", "", "Connector source block ID")
+	cmd.Flags().StringVar(&opts.ConnectorTo, "to", "", "Connector target block ID")
+	cmd.Flags().IntVar(&opts.Limit, "limit", 0, "Maximum matches; 0 returns all")
+	cmd.Flags().IntVar(&opts.TextLimit, "text-limit", 240, "Maximum text length for each result")
 	return cmd
 }
 

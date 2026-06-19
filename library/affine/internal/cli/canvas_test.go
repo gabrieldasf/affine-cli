@@ -10,6 +10,7 @@ func TestRootIncludesCanvasCommands(t *testing.T) {
 	for _, args := range [][]string{
 		{"canvas"},
 		{"canvas", "plan"},
+		{"canvas", "search"},
 		{"canvas", "model"},
 		{"canvas", "validate"},
 		{"canvas", "apply"},

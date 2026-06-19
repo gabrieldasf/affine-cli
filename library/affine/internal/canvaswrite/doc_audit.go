@@ -59,10 +59,10 @@ type DocAuditNoteModeStats struct {
 }
 
 func AuditDoc(cfg *config.Config, opts DocAuditOptions) (DocAuditResult, error) {
-	if opts.WorkspaceID == "" {
+	if opts.SnapshotFile == "" && opts.WorkspaceID == "" {
 		return DocAuditResult{}, fmt.Errorf("--workspace is required")
 	}
-	if opts.DocID == "" {
+	if opts.SnapshotFile == "" && opts.DocID == "" {
 		return DocAuditResult{}, fmt.Errorf("--doc is required")
 	}
 	if opts.TextLimit <= 0 {
@@ -196,6 +196,13 @@ func auditBlocks(cfg *config.Config, engine *yjs.Engine, opts DocAuditOptions) (
 			return nil, err
 		}
 		return engine.ReadBlocks(doc)
+	}
+
+	if opts.WorkspaceID == "" {
+		return nil, fmt.Errorf("--workspace is required")
+	}
+	if opts.DocID == "" {
+		return nil, fmt.Errorf("--doc is required")
 	}
 
 	if opts.Timestamp != "" {

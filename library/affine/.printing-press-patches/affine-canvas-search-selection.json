@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "id": "affine-canvas-search-selection",
+  "applied_at": "2026-06-18",
+  "base_run_id": "20260617-174848",
+  "base_printing_press_version": "4.24.0",
+  "summary": "Adds read-only AFFiNE canvas entity search for blocks, cards, and connectors.",
+  "reason": "Operators need stable selector JSON before canvas diff, transform planning, or gated live apply can safely target exact entities.",
+  "files": [
+    "internal/canvaswrite/search.go",
+    "internal/canvaswrite/search_test.go",
+    "internal/canvaswrite/doc_audit.go",
+    "internal/canvaswrite/integrity.go",
+    "internal/cli/canvas.go",
+    "internal/cli/canvas_test.go",
+    "internal/cli/root.go",
+    "internal/cli/which.go",
+    "README.md",
+    "SKILL.md"
+  ],
+  "validated_outcome": "go test ./internal/canvaswrite ./internal/cli covers selector output, command wiring, and snapshot-local access checks."
+}

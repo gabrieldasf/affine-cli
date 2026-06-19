@@ -28,6 +28,7 @@ type whichEntry struct {
 // query to one of the commands the skill says matter most.
 var whichIndex = []whichEntry{
 	{Command: "canvas plan", Description: "Builds a deterministic AFFiNE canvas card layout from a compact JSON tree spec.", Group: "Canvas operations", WhyItMatters: "Use this before applying or reviewing a new canvas structure."},
+	{Command: "canvas search", Description: "Finds AFFiNE canvas blocks, cards, and connectors by stable selector fields.", Group: "Canvas operations", WhyItMatters: "Use this to select exact canvas entities before diffing or planning changes."},
 	{Command: "canvas model", Description: "Normalizes AFFiNE canvas JSON into explicit nodes and connectors.", Group: "Canvas operations", WhyItMatters: "Use this when comparing or auditing canvas structure."},
 	{Command: "canvas validate", Description: "Checks planned canvas nodes and connectors for invalid geometry and orphaned links.", Group: "Canvas safety", WhyItMatters: "Use this before applying generated canvas plans."},
 	{Command: "canvas apply", Description: "Converts a canvas plan into explicit dry-run operations without enabling live Y.js writes.", Group: "Canvas safety", WhyItMatters: "Use this to inspect the exact operations a plan would perform."},
