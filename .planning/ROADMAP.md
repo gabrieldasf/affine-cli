@@ -29,6 +29,8 @@ Requirements covered: CANVAS-01, CANVAS-03, CANVAS-07 partial.
 
 Exit gate: diff categories are stable and fixture-backed.
 
+Status: complete on 2026-06-19. Evidence: `.planning/phases/02-canvas-diff-and-history-diagnosis/VERIFICATION.md`.
+
 ### Phase 3: Canvas Transform Dry-Run Plans
 
 Build `canvas transform` as a no-mutation planner that consumes selectors and emits machine-applyable operation plans.

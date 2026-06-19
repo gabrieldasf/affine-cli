@@ -58,6 +58,13 @@ These capabilities aren't available in any other tool for this API.
   ```bash
   affine-pp-cli canvas search --snapshot-file doc.bin --text roadmap --json
   ```
+- **`canvas diff`** — Compares two AFFiNE canvas states and reports semantic entity changes.
+
+  _Use this to diagnose added, removed, changed, moved, relinked, media, and integrity differences before transform planning._
+
+  ```bash
+  affine-pp-cli canvas diff --before-snapshot old.bin --after-snapshot new.bin --json
+  ```
 - **`canvas model`** — Normalizes AFFiNE canvas JSON into explicit nodes and connectors.
 
   _Use this when comparing or auditing canvas structure._

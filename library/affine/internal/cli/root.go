@@ -147,6 +147,7 @@ func newRootCmd(flags *rootFlags) *cobra.Command {
 Highlights (not in the official API docs):
   • canvas plan   Builds a deterministic AFFiNE canvas card layout from a compact JSON tree spec.
   • canvas search   Finds AFFiNE canvas blocks, cards, and connectors by stable selector fields.
+  • canvas diff   Compares two AFFiNE canvas states and reports semantic entity changes.
   • canvas model   Normalizes AFFiNE canvas JSON into explicit nodes and connectors.
   • canvas validate   Checks planned canvas nodes and connectors for invalid geometry and orphaned links.
   • canvas apply   Converts a canvas plan into explicit dry-run operations without enabling live Y.js writes.

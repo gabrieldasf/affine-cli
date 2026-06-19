@@ -100,12 +100,46 @@ func newCanvasCmd(flags *rootFlags) *cobra.Command {
 	cmd.AddCommand(newCanvasPlanCmd(flags))
 	cmd.AddCommand(newCanvasApplyCmd(flags))
 	cmd.AddCommand(newCanvasSearchCmd(flags))
+	cmd.AddCommand(newCanvasDiffCmd(flags))
 	cmd.AddCommand(newCanvasModelCmd(flags))
 	cmd.AddCommand(newCanvasValidateCmd(flags))
 	cmd.AddCommand(newCanvasExampleCmd())
 	cmd.AddCommand(newCanvasCardCmd(flags))
 	cmd.AddCommand(newCanvasDocCmd(flags))
 	cmd.AddCommand(newCanvasBlockCmd(flags))
+	return cmd
+}
+
+func newCanvasDiffCmd(flags *rootFlags) *cobra.Command {
+	var opts canvaswrite.DiffOptions
+	cmd := &cobra.Command{
+		Use:   "diff",
+		Short: "Compare two AFFiNE canvas states",
+		Example: "  affine-pp-cli canvas diff --before-snapshot old.bin --after-snapshot new.bin --json\n" +
+			"  affine-pp-cli canvas diff --workspace <workspace-id> --doc <doc-id> --before-timestamp <ts> --json",
+		Annotations: map[string]string{
+			"mcp:read-only":    "true",
+			"pp:requires-tier": "affine-workspace-fixture",
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load(flags.configPath)
+			if err != nil {
+				return err
+			}
+			result, err := canvaswrite.DiffDoc(cfg, opts)
+			if err != nil {
+				return err
+			}
+			return writeJSON(cmd.OutOrStdout(), result)
+		},
+	}
+	cmd.Flags().StringVar(&opts.WorkspaceID, "workspace", "", "AFFiNE workspace ID")
+	cmd.Flags().StringVar(&opts.DocID, "doc", "", "AFFiNE document ID")
+	cmd.Flags().StringVar(&opts.BeforeSnapshotFile, "before-snapshot", "", "Before-state local AFFiNE Y.js snapshot file")
+	cmd.Flags().StringVar(&opts.AfterSnapshotFile, "after-snapshot", "", "After-state local AFFiNE Y.js snapshot file")
+	cmd.Flags().StringVar(&opts.BeforeTimestamp, "before-timestamp", "", "Before-state AFFiNE history timestamp")
+	cmd.Flags().StringVar(&opts.AfterTimestamp, "after-timestamp", "", "After-state AFFiNE history timestamp; defaults to live when omitted")
+	cmd.Flags().IntVar(&opts.TextLimit, "text-limit", 240, "Maximum text length for compared entities")
 	return cmd
 }
 

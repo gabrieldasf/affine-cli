@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "id": "affine-canvas-diff-diagnosis",
+  "applied_at": "2026-06-19",
+  "base_run_id": "20260617-174848",
+  "base_printing_press_version": "4.24.0",
+  "summary": "Adds read-only AFFiNE canvas diff diagnosis on top of the canvas search selector model.",
+  "reason": "Operators need stable before/after diagnosis before machine-applyable transform plans can safely target canvas entities.",
+  "files": [
+    "internal/canvaswrite/diff.go",
+    "internal/canvaswrite/diff_test.go",
+    "internal/cli/canvas.go",
+    "internal/cli/canvas_test.go",
+    "internal/cli/root.go",
+    "internal/cli/which.go",
+    "README.md",
+    "SKILL.md"
+  ],
+  "validated_outcome": "go test ./internal/canvaswrite ./internal/cli covers diff categories, input validation, and command wiring."
+}

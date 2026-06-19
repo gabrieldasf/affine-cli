@@ -11,6 +11,7 @@ func TestRootIncludesCanvasCommands(t *testing.T) {
 		{"canvas"},
 		{"canvas", "plan"},
 		{"canvas", "search"},
+		{"canvas", "diff"},
 		{"canvas", "model"},
 		{"canvas", "validate"},
 		{"canvas", "apply"},
