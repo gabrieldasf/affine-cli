@@ -313,7 +313,7 @@ func newCanvasDocRepairCmd(flags *rootFlags) *cobra.Command {
 		Use:   "repair",
 		Short: "Repair a narrow set of safe AFFiNE canvas document integrity issues",
 		Example: "  affine-pp-cli canvas doc repair --workspace <workspace-id> --doc <doc-id> --dry-run --json\n" +
-			"  affine-pp-cli canvas doc repair --workspace <workspace-id> --doc <doc-id> --fix connector-blocks --apply --backup-dir ./backups --json",
+			"  affine-pp-cli canvas doc repair --workspace <workspace-id> --doc <doc-id> --fix connector-blocks --all --apply --backup-dir ./backups --json",
 		Annotations: map[string]string{
 			"pp:requires-tier": "affine-workspace-fixture",
 		},
@@ -335,8 +335,10 @@ func newCanvasDocRepairCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&opts.WorkspaceID, "workspace", "", "AFFiNE workspace ID")
 	cmd.Flags().StringVar(&opts.DocID, "doc", "", "AFFiNE document ID")
 	cmd.Flags().StringVar(&opts.Fix, "fix", "missing-children", "Integrity issue to fix: missing-children or connector-blocks")
+	cmd.Flags().StringSliceVar(&opts.IDs, "id", nil, "Repair only selected issue block ID; may be repeated or comma-separated")
 	cmd.Flags().StringVar(&opts.BackupDir, "backup-dir", "", "Directory for before/delta backups when applying")
 	cmd.Flags().BoolVar(&opts.Apply, "apply", false, "Push the repair update to AFFiNE")
+	cmd.Flags().BoolVar(&opts.All, "all", false, "Allow broad repair of every matching issue")
 	return cmd
 }
 

@@ -100,3 +100,28 @@ func TestRepairIssueIDsSelectsConnectorBlocks(t *testing.T) {
 		t.Fatalf("ids = %#v, want connector", got)
 	}
 }
+
+func TestFilterRepairIDsKeepsOnlySelectedCandidates(t *testing.T) {
+	got := filterRepairIDs([]string{"a", "b", "c"}, []string{" c ", "missing", "a"})
+	want := []string{"a", "c"}
+	if len(got) != len(want) {
+		t.Fatalf("ids = %#v, want %#v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("ids = %#v, want %#v", got, want)
+		}
+	}
+}
+
+func TestValidateRepairApplyRequiresExplicitConnectorBlockScope(t *testing.T) {
+	if err := validateRepairApply("connector-blocks", nil, false, 2); err == nil {
+		t.Fatal("error = nil, want explicit scope error")
+	}
+	if err := validateRepairApply("connector-blocks", []string{"a"}, false, 2); err != nil {
+		t.Fatalf("targeted repair error: %v", err)
+	}
+	if err := validateRepairApply("connector-blocks", nil, true, 2); err != nil {
+		t.Fatalf("broad repair error: %v", err)
+	}
+}

@@ -48,6 +48,8 @@ type DocRepairOptions struct {
 	Fix         string
 	BackupDir   string
 	Apply       bool
+	IDs         []string
+	All         bool
 }
 
 type DocRepairResult struct {
@@ -200,6 +202,9 @@ func RepairDoc(cfg *config.Config, opts DocRepairOptions) (DocRepairResult, erro
 	}
 	before := CheckBlocksIntegrity(opts.DocID, blocks)
 	fixedIDs := repairIssueIDs(before, opts.Fix)
+	if len(opts.IDs) > 0 {
+		fixedIDs = filterRepairIDs(fixedIDs, opts.IDs)
+	}
 	result := DocRepairResult{
 		DocID:    opts.DocID,
 		Fix:      opts.Fix,
@@ -214,6 +219,9 @@ func RepairDoc(cfg *config.Config, opts DocRepairOptions) (DocRepairResult, erro
 	}
 	if !opts.Apply {
 		return result, nil
+	}
+	if err := validateRepairApply(opts.Fix, opts.IDs, opts.All, len(fixedIDs)); err != nil {
+		return DocRepairResult{}, err
 	}
 	if opts.BackupDir == "" {
 		opts.BackupDir = filepath.Join(os.TempDir(), "affine-repair-"+time.Now().Format("20060102-150405"))
@@ -377,6 +385,31 @@ func repairIssueIDs(result DocIntegrityResult, fix string) []string {
 	}
 	sort.Strings(ids)
 	return ids
+}
+
+func filterRepairIDs(candidates, selected []string) []string {
+	wanted := map[string]bool{}
+	for _, id := range selected {
+		id = strings.TrimSpace(id)
+		if id != "" {
+			wanted[id] = true
+		}
+	}
+	var out []string
+	for _, id := range candidates {
+		if wanted[id] {
+			out = append(out, id)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+func validateRepairApply(fix string, ids []string, all bool, candidateCount int) error {
+	if fix == "connector-blocks" && candidateCount > 0 && len(ids) == 0 && !all {
+		return fmt.Errorf("--fix connector-blocks --apply requires --id for targeted repair or --all for broad repair; dry-run found %d connector block(s)", candidateCount)
+	}
+	return nil
 }
 
 func integritySummary(result DocIntegrityResult) string {
