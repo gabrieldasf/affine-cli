@@ -39,6 +39,8 @@ Requirements covered: CANVAS-04, CANVAS-06 partial, CANVAS-07 partial.
 
 Exit gate: transform output is accepted by `canvas apply --dry-run` and rejected when integrity or validation fails.
 
+Status: complete on 2026-06-19. Evidence: `.planning/phases/03-canvas-transform-dry-run-plans/VERIFICATION.md`.
+
 ### Phase 4: Gated Live Apply And Publish Proof
 
 Enable live apply only after Phase 3 plans are stable. Add backups, delta capture, reload verification, docs, patch records, MCP annotation review, and official publish proof.

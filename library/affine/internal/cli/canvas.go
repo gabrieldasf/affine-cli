@@ -101,12 +101,49 @@ func newCanvasCmd(flags *rootFlags) *cobra.Command {
 	cmd.AddCommand(newCanvasApplyCmd(flags))
 	cmd.AddCommand(newCanvasSearchCmd(flags))
 	cmd.AddCommand(newCanvasDiffCmd(flags))
+	cmd.AddCommand(newCanvasTransformCmd(flags))
 	cmd.AddCommand(newCanvasModelCmd(flags))
 	cmd.AddCommand(newCanvasValidateCmd(flags))
 	cmd.AddCommand(newCanvasExampleCmd())
 	cmd.AddCommand(newCanvasCardCmd(flags))
 	cmd.AddCommand(newCanvasDocCmd(flags))
 	cmd.AddCommand(newCanvasBlockCmd(flags))
+	return cmd
+}
+
+func newCanvasTransformCmd(flags *rootFlags) *cobra.Command {
+	var opts canvaswrite.TransformOptions
+	var selectorsPath string
+	cmd := &cobra.Command{
+		Use:   "transform",
+		Short: "Build a dry-run AFFiNE canvas transform plan",
+		Example: "  affine-pp-cli canvas transform --selectors search.json --move 10,0 --json\n" +
+			"  affine-pp-cli canvas transform --id card-a --display-mode embed --json",
+		Annotations: map[string]string{
+			"mcp:read-only": "true",
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			selectors, err := readCanvasSelectors(selectorsPath, cmd.InOrStdin(), len(opts.IDs) > 0)
+			if err != nil {
+				return err
+			}
+			plan, err := canvaswrite.BuildTransformPlan(selectors, opts)
+			if err != nil {
+				return err
+			}
+			return writeJSON(cmd.OutOrStdout(), plan)
+		},
+	}
+	cmd.Flags().StringVar(&selectorsPath, "selectors", "", "canvas search JSON file; use - for stdin")
+	cmd.Flags().StringVar(&opts.DocID, "doc", "", "AFFiNE document ID for the transform plan")
+	cmd.Flags().StringSliceVar(&opts.IDs, "id", nil, "Selected block ID; may be repeated or comma-separated")
+	cmd.Flags().StringVar(&opts.Move, "move", "", "Move selected entities by dx,dy")
+	cmd.Flags().StringVar(&opts.Resize, "resize", "", "Resize selected entities to width,height")
+	cmd.Flags().StringVar(&opts.Align, "align", "", "Align selected entities: left, right, top, bottom, center-x, center-y")
+	cmd.Flags().StringVar(&opts.Distribute, "distribute", "", "Distribute selected entities: horizontal or vertical")
+	cmd.Flags().StringVar(&opts.DisplayMode, "display-mode", "", "Set selected cards to display mode")
+	cmd.Flags().StringArrayVar(&opts.Metadata, "set", nil, "Set metadata as key=value; may be repeated")
+	cmd.Flags().StringVar(&opts.BackupTarget, "backup-target", "", "Expected backup target for later live apply proof")
 	return cmd
 }
 
@@ -437,20 +474,33 @@ func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 			if !flags.dryRun {
 				return fmt.Errorf("canvas apply currently requires --dry-run")
 			}
-			plan, err := readCanvasPlanOrExample(planPath, cmd.InOrStdin())
+			payload, err := readCanvasApplyPayload(planPath, cmd.InOrStdin())
 			if err != nil {
 				return err
 			}
-			ops := map[string]any{
-				"dry_run": true,
-				"frame":   plan.Frame,
-				"operations": map[string]any{
-					"upsert_nodes":         plan.Nodes,
-					"upsert_connections":   plan.Connections,
+			switch plan := payload.(type) {
+			case canvaswrite.TransformPlan:
+				return writeJSON(cmd.OutOrStdout(), map[string]any{
+					"dry_run":              true,
+					"plan_type":            plan.PlanType,
+					"plan_id":              plan.PlanID,
+					"affected_ids":         plan.AffectedIDs,
+					"operations":           plan.Operations,
 					"live_write_supported": false,
-				},
+				})
+			case canvasPlan:
+				return writeJSON(cmd.OutOrStdout(), map[string]any{
+					"dry_run": true,
+					"frame":   plan.Frame,
+					"operations": map[string]any{
+						"upsert_nodes":         plan.Nodes,
+						"upsert_connections":   plan.Connections,
+						"live_write_supported": false,
+					},
+				})
+			default:
+				return fmt.Errorf("unsupported canvas apply payload")
 			}
-			return writeJSON(cmd.OutOrStdout(), ops)
 		},
 	}
 	cmd.Flags().StringVar(&planPath, "plan", "", "JSON plan path; reads stdin when empty")
@@ -576,6 +626,61 @@ func readCanvasPlan(path string, stdin io.Reader) (canvasPlan, error) {
 	}
 	if err := json.Unmarshal(data, &plan); err != nil {
 		return plan, fmt.Errorf("parsing canvas plan JSON: %w", err)
+	}
+	return plan, nil
+}
+
+func readCanvasSelectors(path string, stdin io.Reader, allowEmpty bool) (canvaswrite.SearchResult, error) {
+	if path == "" {
+		if allowEmpty {
+			return canvaswrite.SearchResult{SourceMode: "direct"}, nil
+		}
+		return canvaswrite.SearchResult{}, fmt.Errorf("pass --selectors or --id")
+	}
+	var data []byte
+	var err error
+	if path == "-" {
+		data, err = io.ReadAll(stdin)
+		if err != nil {
+			return canvaswrite.SearchResult{}, fmt.Errorf("reading stdin: %w", err)
+		}
+	} else {
+		data, err = os.ReadFile(path)
+		if err != nil {
+			return canvaswrite.SearchResult{}, err
+		}
+	}
+	var selectors canvaswrite.SearchResult
+	if err := json.Unmarshal(data, &selectors); err != nil {
+		return selectors, fmt.Errorf("parsing canvas search JSON: %w", err)
+	}
+	return selectors, nil
+}
+
+func readCanvasApplyPayload(path string, stdin io.Reader) (any, error) {
+	data, err := readAllOrFile(path, stdin)
+	if err != nil {
+		if path == "" {
+			return buildCanvasPlan(exampleCanvasBuildSpec()), nil
+		}
+		return nil, err
+	}
+	var envelope struct {
+		PlanType string `json:"plan_type"`
+	}
+	if err := json.Unmarshal(data, &envelope); err != nil {
+		return nil, fmt.Errorf("parsing canvas apply JSON: %w", err)
+	}
+	if envelope.PlanType == "canvas_transform" {
+		var plan canvaswrite.TransformPlan
+		if err := json.Unmarshal(data, &plan); err != nil {
+			return nil, fmt.Errorf("parsing canvas transform plan JSON: %w", err)
+		}
+		return plan, nil
+	}
+	var plan canvasPlan
+	if err := json.Unmarshal(data, &plan); err != nil {
+		return nil, fmt.Errorf("parsing canvas plan JSON: %w", err)
 	}
 	return plan, nil
 }

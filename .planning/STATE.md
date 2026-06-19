@@ -3,7 +3,7 @@
 ## Current Status
 
 - Active milestone: v1.1 Canvas Power Tools
-- Current phase: Phase 2 complete; Phase 3 next
+- Current phase: Phase 3 complete; Phase 4 next
 - Last planning update: 2026-06-19
 - Git baseline: main at 4f9a09c3
 
@@ -21,7 +21,9 @@
 - Verification passed: `go test ./internal/canvaswrite ./internal/cli`, `go test ./...`, `go run ./cmd/affine-pp-cli canvas search --help`, and `go run ./cmd/affine-pp-cli which canvas --json`.
 - Phase 2 implemented `canvas diff` for read-only semantic comparison across snapshot, history and live source modes.
 - Verification passed: `go test ./...`, `go run ./cmd/affine-pp-cli canvas diff --help`, and `go run ./cmd/affine-pp-cli which "canvas diff" --json`.
+- Phase 3 implemented `canvas transform` dry-run operation plans and transform-plan compatibility in `canvas apply --dry-run`.
+- Verification passed: `go test ./internal/canvaswrite ./internal/cli`, `go test ./...`, `go run ./cmd/affine-pp-cli canvas transform --help`, `go run ./cmd/affine-pp-cli which "canvas transform" --json`, and selector-to-apply dry-run smoke.
 
 ## Next Action
 
-Start Phase 3 by building `canvas transform` dry-run operation plans on top of search selectors and diff categories.
+Start Phase 4 by adding gated live apply and publish proof around the Phase 3 transform plan contract.

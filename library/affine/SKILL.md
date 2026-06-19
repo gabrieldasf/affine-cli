@@ -65,6 +65,13 @@ These capabilities aren't available in any other tool for this API.
   ```bash
   affine-pp-cli canvas diff --before-snapshot old.bin --after-snapshot new.bin --json
   ```
+- **`canvas transform`** — Builds dry-run operation plans for selected AFFiNE canvas entities.
+
+  _Use this to plan move, resize, align, distribute, display mode, and metadata changes before apply._
+
+  ```bash
+  affine-pp-cli canvas transform --selectors search.json --move 10,0 --json
+  ```
 - **`canvas model`** — Normalizes AFFiNE canvas JSON into explicit nodes and connectors.
 
   _Use this when comparing or auditing canvas structure._
@@ -81,7 +88,7 @@ These capabilities aren't available in any other tool for this API.
   ```bash
   affine-pp-cli canvas validate --json
   ```
-- **`canvas apply`** — Converts a canvas plan into explicit dry-run operations without enabling live Y.js writes.
+- **`canvas apply`** — Converts a canvas layout or transform plan into explicit dry-run operations without enabling live Y.js writes.
 
   _Use this to inspect the exact operations a plan would perform._
 
