@@ -88,12 +88,14 @@ These capabilities aren't available in any other tool for this API.
   ```bash
   affine-pp-cli canvas validate --json
   ```
-- **`canvas apply`** — Converts a canvas layout or transform plan into explicit dry-run operations without enabling live Y.js writes.
+- **`canvas apply`** — Dry-runs canvas plans and applies transform or layout plans only behind explicit live gates.
 
-  _Use this to inspect the exact operations a plan would perform._
+  _Use this to inspect exact operations or run a backed-up live apply after fixture approval._
 
   ```bash
   affine-pp-cli canvas apply --dry-run --json
+  affine-pp-cli canvas apply --plan transform.json --live --workspace <workspace-id> --doc <doc-id> --backup-dir ./backups --yes --json
+  affine-pp-cli canvas apply --plan layout.json --live --workspace <workspace-id> --doc <doc-id> --backup-dir ./backups --yes --json
   ```
 
 ### Canvas repair

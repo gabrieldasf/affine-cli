@@ -52,8 +52,71 @@ func TestCanvasApplyAcceptsTransformPlan(t *testing.T) {
 	if err := json.Unmarshal(out.Bytes(), &got); err != nil {
 		t.Fatalf("output is not JSON: %v\n%s", err, out.String())
 	}
-	if got["plan_type"] != "canvas_transform" || got["live_write_supported"] != false {
-		t.Fatalf("apply output = %#v, want transform dry-run no live write", got)
+	if got["plan_type"] != "canvas_transform" || got["live_write_supported"] != true {
+		t.Fatalf("apply output = %#v, want transform dry-run with gated live support", got)
+	}
+	if _, ok := got["semantic_diff_preview"].([]any); !ok {
+		t.Fatalf("apply output = %#v, want semantic_diff_preview", got)
+	}
+}
+
+func TestCanvasApplyLiveRequiresConfirmationBeforeNetwork(t *testing.T) {
+	root := RootCmd()
+	var out bytes.Buffer
+	root.SetOut(&out)
+	root.SetErr(&out)
+	root.SetIn(strings.NewReader(`{
+		"plan_type": "canvas_transform",
+		"plan_id": "canvas-transform-test",
+		"dry_run": true,
+		"doc_id": "doc",
+		"integrity": {"ok": true},
+		"affected_ids": ["card"],
+		"operations": [{"kind": "set_display_mode", "id": "card", "after": "embed"}]
+	}`))
+	root.SetArgs([]string{"canvas", "apply", "--live", "--workspace", "workspace", "--doc", "doc", "--backup-dir", t.TempDir(), "--json"})
+	err := root.Execute()
+	if err == nil || !strings.Contains(err.Error(), "confirmation required") {
+		t.Fatalf("Execute error = %v, want confirmation required before live apply\n%s", err, out.String())
+	}
+}
+
+func TestCanvasApplyLiveRequiresBackupDirBeforeNetwork(t *testing.T) {
+	root := RootCmd()
+	var out bytes.Buffer
+	root.SetOut(&out)
+	root.SetErr(&out)
+	root.SetIn(strings.NewReader(`{
+		"plan_type": "canvas_transform",
+		"plan_id": "canvas-transform-test",
+		"dry_run": true,
+		"doc_id": "doc",
+		"integrity": {"ok": true},
+		"affected_ids": ["card"],
+		"operations": [{"kind": "set_display_mode", "id": "card", "after": "embed"}]
+	}`))
+	root.SetArgs([]string{"canvas", "apply", "--live", "--workspace", "workspace", "--doc", "doc", "--yes", "--json"})
+	err := root.Execute()
+	if err == nil || !strings.Contains(err.Error(), "--backup-dir is required") {
+		t.Fatalf("Execute error = %v, want backup-dir gate before live apply\n%s", err, out.String())
+	}
+}
+
+func TestCanvasApplyLayoutLiveRequiresBackupDirBeforeNetwork(t *testing.T) {
+	root := RootCmd()
+	var out bytes.Buffer
+	root.SetOut(&out)
+	root.SetErr(&out)
+	root.SetIn(strings.NewReader(`{
+		"frame": "LIVE ZAP",
+		"orientation": "vertical",
+		"nodes": [{"id": "live-zap", "text": "Live Zap", "w": 360, "h": 220}],
+		"connections": []
+	}`))
+	root.SetArgs([]string{"canvas", "apply", "--live", "--workspace", "workspace", "--doc", "doc", "--yes", "--json"})
+	err := root.Execute()
+	if err == nil || !strings.Contains(err.Error(), "--backup-dir is required") {
+		t.Fatalf("Execute error = %v, want backup-dir gate before live layout apply\n%s", err, out.String())
 	}
 }
 

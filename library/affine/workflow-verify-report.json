@@ -1,8 +1,40 @@
 {
   "dir": "\u003ccli-dir\u003e\\affine",
-  "workflows": null,
-  "verdict": "workflow-pass",
-  "issues": [
-    "no workflow manifest found, skipping"
-  ]
+  "workflows": [
+    {
+      "name": "canvas-transform-dry-run",
+      "primary": true,
+      "steps": [
+        {
+          "command": "canvas transform --selectors testdata/workflow/canvas-selector.json --move 5,0",
+          "status": "pass",
+          "output": "{\n  \"plan_type\": \"canvas_transform\",\n  \"plan_id\": \"canvas-transform-acd73e47\",\n  \"dry_run\": true,\n  \"source\": {\n    \"mode\": \"snapshot\",\n    \"count\": 1\n  },\n  \"affected_ids\": [\n    \"card\"\n  ],\n  \"operations\": [\n    {\n      \"kind\": \"move\",\n      \"id\": \"card\",\n      \"before\": [\n        10,\n        20,\n        100,\n        80\n      ],\n      \"after\": [\n        15,\n        20,\n        100,\n        80\n      ]\n    }\n  ],\n  \"integrity\": {\n    \"ok\": true,\n    \"block_count\": 0,\n    \"issue_count\": 0,\n    \"summary\": {}\n  },\n  \"rollback\": {\n    \"required\": true,\n    \"fields\": [\n      \"before_snapshot\",\n      \"delta\",\n      \"affected_ids\"\n    ]\n  },\n  \"proof\": {\n    \"required\": true,\n    \"fields\": [\n      \"pre_integrity\",\n      \"post_integrity\",\n      \"reload_verification\"\n    ]\n  }\n}\n"
+        },
+        {
+          "command": "canvas apply --plan testdata/workflow/canvas-transform-plan.json --dry-run",
+          "status": "pass",
+          "output": "{\n  \"affected_ids\": [\n    \"card\"\n  ],\n  \"dry_run\": true,\n  \"live_write_requires\": [\n    \"--live\",\n    \"--workspace\",\n    \"--doc\",\n    \"--backup-dir\",\n    \"--yes\"\n  ],\n  \"live_write_supported\": true,\n  \"operations\": [\n    {\n      \"kind\": \"set_display_mode\",\n      \"id\": \"card\",\n      \"after\": \"embed\"\n    }\n  ],\n  \"plan_id\": \"canvas-transform-smoke\",\n  \"plan_type\": \"canvas_transform\",\n  \"semantic_diff_preview\": [\n    {\n      \"category\": \"display_mode_changed\",\n      \"severity\": \"info\",\n      \"id\": \"card\",\n      \"after\": \"embed\",\n      \"suggested_next_action\": \"Verify this planned transform before live apply.\"\n    }\n  ]\n}\n"
+        }
+      ],
+      "verdict": "workflow-pass"
+    },
+    {
+      "name": "canvas-layout-dry-run",
+      "primary": false,
+      "steps": [
+        {
+          "command": "canvas validate --plan testdata/workflow/canvas-layout-plan.json",
+          "status": "pass",
+          "output": "{\n  \"ok\": true,\n  \"issue_count\": 0\n}\n"
+        },
+        {
+          "command": "canvas apply --plan testdata/workflow/canvas-layout-plan.json --dry-run",
+          "status": "pass",
+          "output": "{\n  \"dry_run\": true,\n  \"frame\": \"LIVE ZAP\",\n  \"live_write_requires\": [\n    \"--live\",\n    \"--workspace\",\n    \"--doc\",\n    \"--backup-dir\",\n    \"--yes\"\n  ],\n  \"live_write_supported\": true,\n  \"operations\": {\n    \"upsert_connections\": [],\n    \"upsert_nodes\": [\n      {\n        \"id\": \"live-zap\",\n        \"text\": \"Live Zap\",\n        \"level\": 0,\n        \"x\": 10,\n        \"y\": 20,\n        \"w\": 360,\n        \"h\": 220\n      }\n    ]\n  },\n  \"plan_type\": \"canvas_layout\"\n}\n"
+        }
+      ],
+      "verdict": "workflow-pass"
+    }
+  ],
+  "verdict": "workflow-pass"
 }

@@ -1,0 +1,29 @@
+workflows:
+  - name: canvas-transform-dry-run
+    primary: true
+    description: Proves selector-to-transform-to-apply remains local and non-mutating.
+    steps:
+      - name: transform-from-selector
+        command: canvas transform --selectors testdata/workflow/canvas-selector.json --move 5,0
+        expect_fields:
+          - plan_type
+          - operations
+      - name: transform-apply-dry-run
+        command: canvas apply --plan testdata/workflow/canvas-transform-plan.json --dry-run
+        expect_fields:
+          - plan_type
+          - semantic_diff_preview
+          - live_write_supported
+  - name: canvas-layout-dry-run
+    description: Proves layout plans validate and apply in non-mutating mode.
+    steps:
+      - name: validate-layout
+        command: canvas validate --plan testdata/workflow/canvas-layout-plan.json
+        expect_fields:
+          - ok
+      - name: layout-apply-dry-run
+        command: canvas apply --plan testdata/workflow/canvas-layout-plan.json --dry-run
+        expect_fields:
+          - plan_type
+          - dry_run
+          - live_write_supported

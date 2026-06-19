@@ -63,3 +63,32 @@ func TestBuildTransformPlanRejectsIntegrityIssues(t *testing.T) {
 		t.Fatal("BuildTransformPlan error = nil, want integrity error")
 	}
 }
+
+func TestValidateTransformApplyRejectsUnsafeMetadata(t *testing.T) {
+	err := ValidateTransformApply(TransformPlan{
+		PlanType: "canvas_transform",
+		PlanID:   "canvas-transform-test",
+		Integrity: DocIntegrityResult{
+			OK: true,
+		},
+		Operations: []TransformOperation{
+			{Kind: "set_metadata", ID: "card", After: map[string]string{"sys:children": "unsafe"}},
+		},
+	}, TransformApplyOptions{WorkspaceID: "workspace", DocID: "doc", BackupDir: "backups"})
+	if err == nil {
+		t.Fatal("ValidateTransformApply error = nil, want unsafe metadata rejection")
+	}
+}
+
+func TestTransformDiffPreviewUsesExistingDiffCategories(t *testing.T) {
+	preview := TransformDiffPreview([]TransformOperation{
+		{Kind: "move", ID: "card", Before: []float64{0, 0, 10, 10}, After: []float64{5, 0, 10, 10}},
+		{Kind: "set_display_mode", ID: "card", Before: "edgeless", After: "embed"},
+	})
+	if len(preview) != 2 {
+		t.Fatalf("preview = %d, want 2", len(preview))
+	}
+	if preview[0].Category != "geometry_changed" || preview[1].Category != "display_mode_changed" {
+		t.Fatalf("preview categories = %#v", preview)
+	}
+}

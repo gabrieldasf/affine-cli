@@ -1,0 +1,16 @@
+{
+  "doc_id": "doc",
+  "frame": "LIVE ZAP",
+  "orientation": "vertical",
+  "nodes": [
+    {
+      "id": "live-zap",
+      "text": "Live Zap",
+      "x": 10,
+      "y": 20,
+      "w": 360,
+      "h": 220
+    }
+  ],
+  "connections": []
+}

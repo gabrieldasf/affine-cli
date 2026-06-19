@@ -1,0 +1,13 @@
+{
+  "doc_id": "doc-1",
+  "source_mode": "snapshot",
+  "count": 1,
+  "entities": [
+    {
+      "id": "card",
+      "kind": "card",
+      "display_mode": "edgeless",
+      "xywh": [10, 20, 100, 80]
+    }
+  ]
+}

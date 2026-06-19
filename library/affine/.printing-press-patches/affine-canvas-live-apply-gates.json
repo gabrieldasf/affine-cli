@@ -1,0 +1,25 @@
+{
+  "schema_version": 2,
+  "id": "affine-canvas-live-apply-gates",
+  "applied_at": "2026-06-19",
+  "base_run_id": "20260617-174848",
+  "base_printing_press_version": "4.24.0",
+  "summary": "Adds explicit --live/--apply gates for AFFiNE canvas transform and layout plans.",
+  "reason": "Canvas live mutation needs backed-up, confirmed, integrity-checked apply paths instead of implicit dry-run output.",
+  "files": [
+    "internal/canvaswrite/transform_apply.go",
+    "internal/cli/canvas.go",
+    "internal/cli/canvas_test.go",
+    "internal/cli/root.go",
+    "internal/cli/which.go",
+    "README.md",
+    "SKILL.md",
+    ".printing-press.json",
+    "workflow_verify.yaml",
+    "workflow-verify-report.json",
+    "testdata/workflow/canvas-selector.json",
+    "testdata/workflow/canvas-transform-plan.json",
+    "testdata/workflow/canvas-layout-plan.json"
+  ],
+  "validated_outcome": "go test ./internal/canvaswrite ./internal/cli, go test ./..., go build ./cmd/affine-pp-cli ./cmd/affine-pp-mcp, canvas apply help smoke, which canvas apply smoke, workflow-verify, publish validate, pre-network live gate smokes, and approved live fixture smoke passed. The live smoke wrote 20 Live Zap cards and 28 connectors to AFFiNE doc B6pvUw-r5SSfWKam-wncU, then applied a second transform proof to the hub card with post-apply integrity OK."
+}

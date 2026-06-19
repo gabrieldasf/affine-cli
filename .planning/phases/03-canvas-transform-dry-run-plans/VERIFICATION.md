@@ -42,7 +42,7 @@ $plan = $selector | go run ./cmd/affine-pp-cli canvas transform --selectors - --
 $plan | go run ./cmd/affine-pp-cli canvas apply --dry-run --json
 ```
 
-Result: passed. `canvas apply --dry-run` accepted the transform plan and returned `live_write_supported: false`.
+Result: passed. `canvas apply --dry-run` accepted the transform plan. Phase 4 later enabled gated live support behind explicit live flags.
 
 ## Integration Review
 

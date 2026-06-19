@@ -1,0 +1,17 @@
+{
+  "plan_type": "canvas_transform",
+  "plan_id": "canvas-transform-smoke",
+  "dry_run": true,
+  "doc_id": "doc",
+  "integrity": {
+    "ok": true
+  },
+  "affected_ids": ["card"],
+  "operations": [
+    {
+      "kind": "set_display_mode",
+      "id": "card",
+      "after": "embed"
+    }
+  ]
+}

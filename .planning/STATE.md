@@ -3,7 +3,7 @@
 ## Current Status
 
 - Active milestone: v1.1 Canvas Power Tools
-- Current phase: Phase 3 complete; Phase 4 next
+- Current phase: Phase 4 complete; v1.1 ready for final branch cleanup
 - Last planning update: 2026-06-19
 - Git baseline: main at 4f9a09c3
 
@@ -23,7 +23,8 @@
 - Verification passed: `go test ./...`, `go run ./cmd/affine-pp-cli canvas diff --help`, and `go run ./cmd/affine-pp-cli which "canvas diff" --json`.
 - Phase 3 implemented `canvas transform` dry-run operation plans and transform-plan compatibility in `canvas apply --dry-run`.
 - Verification passed: `go test ./internal/canvaswrite ./internal/cli`, `go test ./...`, `go run ./cmd/affine-pp-cli canvas transform --help`, `go run ./cmd/affine-pp-cli which "canvas transform" --json`, and selector-to-apply dry-run smoke.
+- Phase 4 implemented gated live apply for transform and layout Canvas plans with required `--live` or `--apply`, `--workspace`, `--doc`, `--backup-dir`, and `--yes`; semantic diff preview, backups, pre/post integrity, tests, live fixture smoke, and workflow proof passed.
 
 ## Next Action
 
-Start Phase 4 by adding gated live apply and publish proof around the Phase 3 transform plan contract.
+Finish branch cleanup and prepare ship review for v1.1 Canvas Power Tools.

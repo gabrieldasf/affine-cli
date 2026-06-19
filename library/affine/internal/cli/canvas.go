@@ -6,10 +6,14 @@ package cli
 import (
 	"affine-pp-cli/internal/canvaswrite"
 	"affine-pp-cli/internal/config"
+	"affine-pp-cli/internal/socketio"
+	"affine-pp-cli/internal/yjs"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -64,6 +68,19 @@ type canvasPlan struct {
 	Nodes       []canvasNode       `json:"nodes"`
 	Connections []canvasConnection `json:"connections"`
 	Warnings    []string           `json:"warnings,omitempty"`
+}
+
+type canvasLayoutApplyResult struct {
+	PlanType           string                         `json:"plan_type"`
+	DocID              string                         `json:"doc_id"`
+	DryRun             bool                           `json:"dry_run"`
+	Applied            bool                           `json:"applied"`
+	BackupDir          string                         `json:"backup_dir"`
+	UpsertedNodes      []string                       `json:"upserted_nodes"`
+	UpsertedConnectors []string                       `json:"upserted_connectors"`
+	Before             canvaswrite.DocIntegrityResult `json:"before"`
+	After              canvaswrite.DocIntegrityResult `json:"after"`
+	Proof              canvaswrite.TransformProof     `json:"proof"`
 }
 
 type canvasModel struct {
@@ -463,16 +480,27 @@ func newCanvasPlanCmd(flags *rootFlags) *cobra.Command {
 
 func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 	var planPath string
+	var workspaceID string
+	var docID string
+	var backupDir string
+	var apply bool
+	var live bool
 	cmd := &cobra.Command{
 		Use:   "apply",
-		Short: "Print canvas operations for a generated plan",
-		Long:  "Print canvas operations for a generated plan. Live Y.js writes are intentionally not enabled yet; use --dry-run.",
+		Short: "Apply or dry-run canvas operations for a generated plan",
+		Long:  "Apply or dry-run canvas operations for a generated plan. Live Y.js writes require --live or --apply plus --workspace, --doc, --backup-dir and --yes.",
 		Example: "  affine-pp-cli canvas apply --dry-run --json\n" +
 			"  affine-pp-cli canvas example | affine-pp-cli canvas plan | affine-pp-cli canvas apply --dry-run --json\n" +
-			"  affine-pp-cli canvas apply --plan plan.json --dry-run --json",
+			"  affine-pp-cli canvas apply --plan plan.json --dry-run --json\n" +
+			"  affine-pp-cli canvas apply --plan transform.json --live --workspace <workspace-id> --doc <doc-id> --backup-dir ./backups --yes --json\n" +
+			"  affine-pp-cli canvas apply --plan layout.json --live --workspace <workspace-id> --doc <doc-id> --backup-dir ./backups --yes --json",
+		Annotations: map[string]string{
+			"pp:requires-tier": "affine-workspace-fixture",
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !flags.dryRun {
-				return fmt.Errorf("canvas apply currently requires --dry-run")
+			liveApply := apply || live
+			if !flags.dryRun && !liveApply {
+				return fmt.Errorf("canvas apply requires --dry-run, --live or --apply")
 			}
 			payload, err := readCanvasApplyPayload(planPath, cmd.InOrStdin())
 			if err != nil {
@@ -480,22 +508,63 @@ func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 			}
 			switch plan := payload.(type) {
 			case canvaswrite.TransformPlan:
+				if liveApply && !flags.dryRun {
+					if !flags.yes {
+						return fmt.Errorf("confirmation required: pass --yes for live canvas apply")
+					}
+					if err := canvaswrite.ValidateTransformApply(plan, canvaswrite.TransformApplyOptions{WorkspaceID: workspaceID, DocID: docID, BackupDir: backupDir}); err != nil {
+						return err
+					}
+					cfg, err := config.Load(flags.configPath)
+					if err != nil {
+						return err
+					}
+					result, err := canvaswrite.ApplyTransformPlan(cfg, plan, canvaswrite.TransformApplyOptions{WorkspaceID: workspaceID, DocID: docID, BackupDir: backupDir})
+					if err != nil {
+						return err
+					}
+					return writeJSON(cmd.OutOrStdout(), result)
+				}
 				return writeJSON(cmd.OutOrStdout(), map[string]any{
-					"dry_run":              true,
-					"plan_type":            plan.PlanType,
-					"plan_id":              plan.PlanID,
-					"affected_ids":         plan.AffectedIDs,
-					"operations":           plan.Operations,
-					"live_write_supported": false,
+					"dry_run":               true,
+					"plan_type":             plan.PlanType,
+					"plan_id":               plan.PlanID,
+					"affected_ids":          plan.AffectedIDs,
+					"operations":            plan.Operations,
+					"semantic_diff_preview": canvaswrite.TransformDiffPreview(plan.Operations),
+					"live_write_supported":  true,
+					"live_write_requires":   []string{"--live", "--workspace", "--doc", "--backup-dir", "--yes"},
 				})
 			case canvasPlan:
+				if liveApply && !flags.dryRun {
+					if !flags.yes {
+						return fmt.Errorf("confirmation required: pass --yes for live canvas apply")
+					}
+					if err := validateCanvasLayoutApply(plan, workspaceID, docID, backupDir); err != nil {
+						return err
+					}
+					cfg, err := config.Load(flags.configPath)
+					if err != nil {
+						return err
+					}
+					result, err := applyCanvasLayoutPlan(cfg, plan, workspaceID, docID, backupDir)
+					if err != nil {
+						return err
+					}
+					return writeJSON(cmd.OutOrStdout(), result)
+				}
+				if !flags.dryRun {
+					return fmt.Errorf("canvas layout apply requires --dry-run or --live")
+				}
 				return writeJSON(cmd.OutOrStdout(), map[string]any{
-					"dry_run": true,
-					"frame":   plan.Frame,
+					"dry_run":              true,
+					"plan_type":            "canvas_layout",
+					"frame":                plan.Frame,
+					"live_write_supported": true,
+					"live_write_requires":  []string{"--live", "--workspace", "--doc", "--backup-dir", "--yes"},
 					"operations": map[string]any{
-						"upsert_nodes":         plan.Nodes,
-						"upsert_connections":   plan.Connections,
-						"live_write_supported": false,
+						"upsert_nodes":       plan.Nodes,
+						"upsert_connections": plan.Connections,
 					},
 				})
 			default:
@@ -504,7 +573,271 @@ func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&planPath, "plan", "", "JSON plan path; reads stdin when empty")
+	cmd.Flags().BoolVar(&apply, "apply", false, "Push a validated transform or layout plan to AFFiNE")
+	cmd.Flags().BoolVar(&live, "live", false, "Alias for --apply; push a validated transform or layout plan to AFFiNE")
+	cmd.Flags().StringVar(&workspaceID, "workspace", "", "AFFiNE workspace ID for live apply")
+	cmd.Flags().StringVar(&docID, "doc", "", "AFFiNE document ID for live apply")
+	cmd.Flags().StringVar(&backupDir, "backup-dir", "", "Directory for before/delta backups when applying")
 	return cmd
+}
+
+func validateCanvasLayoutApply(plan canvasPlan, workspaceID, docID, backupDir string) error {
+	if workspaceID == "" {
+		return fmt.Errorf("--workspace is required for live canvas apply")
+	}
+	if docID == "" {
+		return fmt.Errorf("--doc is required for live canvas apply")
+	}
+	if backupDir == "" {
+		return fmt.Errorf("--backup-dir is required for live canvas apply")
+	}
+	report := validateCanvasPlan(plan)
+	if !report.OK {
+		return fmt.Errorf("canvas layout plan is invalid: %d issue(s)", report.IssueCount)
+	}
+	return nil
+}
+
+func applyCanvasLayoutPlan(cfg *config.Config, plan canvasPlan, workspaceID, docID, backupDir string) (canvasLayoutApplyResult, error) {
+	bearer := cfg.AffineToken
+	if bearer == "" {
+		bearer = strings.TrimPrefix(cfg.AuthHeader(), "Bearer ")
+	}
+	client, err := socketio.Connect(socketio.WSURLFromGraphQL(strings.TrimRight(cfg.BaseURL, "/")+"/graphql"), "", bearer)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	defer client.Close()
+	if err := client.JoinWorkspace(workspaceID, "0.26.0"); err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+
+	engine, err := yjs.NewEngine()
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	loaded, err := client.LoadDoc(workspaceID, docID)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	if loaded.Missing == "" {
+		return canvasLayoutApplyResult{}, fmt.Errorf("document returned empty snapshot")
+	}
+	doc, err := engine.ApplyBase64Update(loaded.Missing)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	blocks, err := engine.ReadBlocks(doc)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	before := canvaswrite.CheckBlocksIntegrity(docID, blocks)
+	if !before.OK {
+		return canvasLayoutApplyResult{}, fmt.Errorf("canvas doc integrity failed before layout apply")
+	}
+	if err := writeCanvasApplyBackup(backupDir, "before", loaded.Missing); err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	stateVector, err := engine.SaveStateVector(doc)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	rawPatch, err := engine.RunScript(canvasLayoutApplyScript(doc, plan))
+	if err != nil {
+		return canvasLayoutApplyResult{}, fmt.Errorf("apply canvas layout: %w", err)
+	}
+	blocks, err = engine.ReadBlocks(doc)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	if err := canvaswrite.EnsureBlocksIntegrity(docID, blocks, "after local layout apply"); err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	delta, err := engine.EncodeDelta(doc, stateVector)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	if err := writeCanvasApplyBackup(backupDir, "delta", delta); err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	if err := client.PushDocUpdate(workspaceID, docID, delta); err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	reloaded, err := client.LoadDoc(workspaceID, docID)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	reloadedDoc, err := engine.ApplyBase64Update(reloaded.Missing)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	reloadedBlocks, err := engine.ReadBlocks(reloadedDoc)
+	if err != nil {
+		return canvasLayoutApplyResult{}, err
+	}
+	after := canvaswrite.CheckBlocksIntegrity(docID, reloadedBlocks)
+	if !after.OK {
+		return canvasLayoutApplyResult{}, fmt.Errorf("canvas doc integrity failed after pushed layout")
+	}
+	var patch struct {
+		UpsertedNodes      []string `json:"upserted_nodes"`
+		UpsertedConnectors []string `json:"upserted_connectors"`
+	}
+	if err := json.Unmarshal([]byte(rawPatch), &patch); err != nil {
+		return canvasLayoutApplyResult{}, fmt.Errorf("parse layout apply result: %w", err)
+	}
+	return canvasLayoutApplyResult{
+		PlanType:           "canvas_layout",
+		DocID:              docID,
+		DryRun:             false,
+		Applied:            true,
+		BackupDir:          backupDir,
+		UpsertedNodes:      patch.UpsertedNodes,
+		UpsertedConnectors: patch.UpsertedConnectors,
+		Before:             before,
+		After:              after,
+		Proof:              canvaswrite.TransformProof{Required: true, Fields: []string{"before.bin", "before.b64", "delta.bin", "delta.b64", "post_integrity"}},
+	}, nil
+}
+
+func canvasLayoutApplyScript(doc int, plan canvasPlan) string {
+	rawPlan, _ := json.Marshal(plan)
+	return fmt.Sprintf(`
+		(function() {
+			var doc = globalThis._docs[%d];
+			var blocks = doc.getMap("blocks");
+			var plan = %s;
+			var pageId = "";
+			blocks.forEach(function(block, id) {
+				if (!pageId && block instanceof Y.Map && block.get("sys:flavour") === "affine:page") pageId = id;
+			});
+			if (!pageId) throw new Error("page root not found");
+			var page = blocks.get(pageId);
+			var pageChildren = page.get("sys:children");
+			if (!(pageChildren instanceof Y.Array)) {
+				pageChildren = new Y.Array();
+				page.set("sys:children", pageChildren);
+			}
+			function hasChild(children, id) {
+				for (var i = 0; i < children.length; i++) if (children.get(i) === id) return true;
+				return false;
+			}
+			function ytext(value) {
+				var t = new Y.Text();
+				t.insert(0, String(value || ""));
+				return t;
+			}
+			function xywh(n) {
+				return "[" + [n.x || 0, n.y || 0, n.w || 360, n.h || 220].map(function(v) {
+					return Number(v).toString();
+				}).join(",") + "]";
+			}
+			var byName = {};
+			var upsertedNodes = [];
+			for (var i = 0; i < (plan.nodes || []).length; i++) {
+				var n = plan.nodes[i];
+				if (!n.id) throw new Error("node missing id");
+				var note = blocks.get(n.id);
+				if (!(note instanceof Y.Map)) {
+					note = new Y.Map();
+					note.set("sys:id", n.id);
+					note.set("sys:flavour", "affine:note");
+					note.set("sys:version", 1);
+					note.set("sys:children", new Y.Array());
+					note.set("prop:displayMode", "edgeless");
+					note.set("prop:hidden", false);
+					note.set("prop:index", "a0");
+					blocks.set(n.id, note);
+				}
+				note.set("prop:xywh", xywh(n));
+				var children = note.get("sys:children");
+				if (!(children instanceof Y.Array)) {
+					children = new Y.Array();
+					note.set("sys:children", children);
+				}
+				var textId = n.id + "-text";
+				var textBlock = blocks.get(textId);
+				if (!(textBlock instanceof Y.Map)) {
+					textBlock = new Y.Map();
+					textBlock.set("sys:id", textId);
+					textBlock.set("sys:flavour", "affine:paragraph");
+					textBlock.set("sys:version", 1);
+					textBlock.set("sys:type", "text");
+					textBlock.set("prop:type", "text");
+					textBlock.set("sys:children", new Y.Array());
+					blocks.set(textId, textBlock);
+				}
+				textBlock.set("prop:text", ytext(n.text || n.id));
+				if (!hasChild(children, textId)) children.insert(children.length, [textId]);
+				if (!hasChild(pageChildren, n.id)) pageChildren.push([n.id]);
+				byName[n.id] = n.id;
+				if (n.text) byName[n.text] = n.id;
+				upsertedNodes.push(n.id);
+			}
+			function endpoint(value) {
+				return byName[value] || value;
+			}
+			function connBounds(from, to) {
+				function parse(id) {
+					var b = blocks.get(id);
+					var s = b && b.get("prop:xywh");
+					var parts = String(s || "0,0,1,1").replace(/[\[\]]/g, "").split(",");
+					return parts.map(function(p) { return Number(p) || 0; });
+				}
+				var a = parse(from), b = parse(to);
+				var ax = a[0] + a[2] / 2, ay = a[1] + a[3] / 2;
+				var bx = b[0] + b[2] / 2, by = b[1] + b[3] / 2;
+				return "[" + [Math.min(ax, bx), Math.min(ay, by), Math.max(1, Math.abs(bx - ax)), Math.max(1, Math.abs(by - ay))].join(",") + "]";
+			}
+			var upsertedConnectors = [];
+			for (var c = 0; c < (plan.connections || []).length; c++) {
+				var edge = plan.connections[c];
+				var from = endpoint(edge.from);
+				var to = endpoint(edge.to);
+				if (!(blocks.get(from) instanceof Y.Map)) throw new Error("missing connector source: " + edge.from);
+				if (!(blocks.get(to) instanceof Y.Map)) throw new Error("missing connector target: " + edge.to);
+				var id = "conn-" + from + "-" + to;
+				var conn = blocks.get(id);
+				if (!(conn instanceof Y.Map)) {
+					conn = new Y.Map();
+					conn.set("sys:id", id);
+					conn.set("sys:flavour", "affine:connector");
+					conn.set("sys:version", 1);
+					conn.set("sys:children", new Y.Array());
+					conn.set("prop:hidden", false);
+					conn.set("prop:index", "a0");
+					conn.set("prop:lockedBySelf", false);
+					conn.set("prop:mode", "orthogonal");
+					conn.set("prop:strokeStyle", "solid");
+					conn.set("prop:strokeWidth", 2);
+					conn.set("prop:stroke", "#111827");
+					conn.set("prop:endArrow", true);
+					blocks.set(id, conn);
+				}
+				conn.set("prop:source", from);
+				conn.set("prop:target", to);
+				conn.set("prop:label", edge.type || "");
+				conn.set("prop:xywh", connBounds(from, to));
+				if (!hasChild(pageChildren, id)) pageChildren.push([id]);
+				upsertedConnectors.push(id);
+			}
+			return JSON.stringify({upserted_nodes: upsertedNodes, upserted_connectors: upsertedConnectors});
+		})()
+	`, doc, string(rawPlan))
+}
+
+func writeCanvasApplyBackup(dir, name, b64 string) error {
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return err
+	}
+	raw, err := base64.StdEncoding.DecodeString(b64)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(dir, name+".bin"), raw, 0o600); err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(dir, name+".b64"), []byte(b64), 0o600)
 }
 
 func newCanvasModelCmd(flags *rootFlags) *cobra.Command {

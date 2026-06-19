@@ -49,6 +49,8 @@ Requirements covered: CANVAS-05, CANVAS-06, CANVAS-07.
 
 Exit gate: live fixture smoke passes after explicit approval, publish validation passes, and workflow proof is non-skipped.
 
+Status: complete on 2026-06-19. Evidence: `.planning/phases/04-gated-live-apply-and-publish-proof/VERIFICATION.md`.
+
 ## Parallelism Rule
 
 No more than two subagents may run at the same time.
