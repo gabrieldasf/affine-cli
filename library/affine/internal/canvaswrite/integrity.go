@@ -106,6 +106,9 @@ func CheckBlocksIntegrity(docID string, blocks map[string]map[string]any) DocInt
 		if flavour == "" {
 			result.addIssue(DocIntegrityIssue{Code: "missing_flavour", ID: id})
 		}
+		if flavour == "affine:connector" {
+			result.addIssue(DocIntegrityIssue{Code: "unsupported_connector_block", ID: id, Flavour: flavour})
+		}
 		children, ok := block["sys:children"].([]any)
 		if _, exists := block["sys:children"]; !exists {
 			result.addIssue(DocIntegrityIssue{Code: "missing_children", ID: id, Flavour: flavour, Text: truncateRunes(stringField(block, "prop:text"), 120)})
@@ -167,8 +170,8 @@ func RepairDoc(cfg *config.Config, opts DocRepairOptions) (DocRepairResult, erro
 	if opts.Fix == "" {
 		opts.Fix = "missing-children"
 	}
-	if opts.Fix != "missing-children" {
-		return DocRepairResult{}, fmt.Errorf("unsupported --fix %q; supported: missing-children", opts.Fix)
+	if opts.Fix != "missing-children" && opts.Fix != "connector-blocks" {
+		return DocRepairResult{}, fmt.Errorf("unsupported --fix %q; supported: missing-children, connector-blocks", opts.Fix)
 	}
 
 	client, err := connect(cfg, opts.WorkspaceID)
@@ -196,7 +199,7 @@ func RepairDoc(cfg *config.Config, opts DocRepairOptions) (DocRepairResult, erro
 		return DocRepairResult{}, err
 	}
 	before := CheckBlocksIntegrity(opts.DocID, blocks)
-	fixedIDs := missingChildrenIDs(before)
+	fixedIDs := repairIssueIDs(before, opts.Fix)
 	result := DocRepairResult{
 		DocID:    opts.DocID,
 		Fix:      opts.Fix,
@@ -231,19 +234,31 @@ func RepairDoc(cfg *config.Config, opts DocRepairOptions) (DocRepairResult, erro
 		(function() {
 			var doc = globalThis._docs[%d];
 			var blocks = doc.getMap("blocks");
+			var fix = %q;
 			var ids = %s;
 			var fixed = [];
 			for (var i = 0; i < ids.length; i++) {
 				var id = ids[i];
 				var block = blocks.get(id);
-				if (block instanceof Y.Map && !(block.get("sys:children") instanceof Y.Array)) {
+				if (fix === "missing-children" && block instanceof Y.Map && !(block.get("sys:children") instanceof Y.Array)) {
 					block.set("sys:children", new Y.Array());
+					fixed.push(id);
+				} else if (fix === "connector-blocks" && block instanceof Y.Map && block.get("sys:flavour") === "affine:connector") {
+					blocks.delete(id);
+					blocks.forEach(function(parent) {
+						if (!(parent instanceof Y.Map)) return;
+						var children = parent.get("sys:children");
+						if (!(children instanceof Y.Array)) return;
+						for (var j = children.length - 1; j >= 0; j--) {
+							if (children.get(j) === id) children.delete(j, 1);
+						}
+					});
 					fixed.push(id);
 				}
 			}
 			return JSON.stringify({fixed_ids: fixed});
 		})()
-	`, doc, string(rawIDs)))
+	`, doc, opts.Fix, string(rawIDs)))
 	if err != nil {
 		return DocRepairResult{}, err
 	}
@@ -349,10 +364,14 @@ func unreachableBlockIDs(blocks map[string]map[string]any, roots []string) []str
 	return out
 }
 
-func missingChildrenIDs(result DocIntegrityResult) []string {
+func repairIssueIDs(result DocIntegrityResult, fix string) []string {
+	code := "missing_children"
+	if fix == "connector-blocks" {
+		code = "unsupported_connector_block"
+	}
 	ids := []string{}
 	for _, issue := range result.Issues {
-		if issue.Code == "missing_children" {
+		if issue.Code == code {
 			ids = append(ids, issue.ID)
 		}
 	}

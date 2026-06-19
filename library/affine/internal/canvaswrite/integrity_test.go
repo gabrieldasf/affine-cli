@@ -66,3 +66,37 @@ func TestCheckBlocksIntegrityDetectsMissingChildRef(t *testing.T) {
 		t.Fatalf("missing_child_ref = %d, want 1", result.Summary["missing_child_ref"])
 	}
 }
+
+func TestCheckBlocksIntegrityDetectsConnectorBlocks(t *testing.T) {
+	result := CheckBlocksIntegrity("doc-1", map[string]map[string]any{
+		"page": {
+			"sys:id":       "page",
+			"sys:flavour":  "affine:page",
+			"sys:children": []any{"bad-connector"},
+		},
+		"bad-connector": {
+			"sys:id":       "bad-connector",
+			"sys:flavour":  "affine:connector",
+			"sys:children": []any{},
+		},
+	})
+
+	if result.OK {
+		t.Fatalf("OK = true, want false")
+	}
+	if result.Summary["unsupported_connector_block"] != 1 {
+		t.Fatalf("unsupported_connector_block = %d, want 1", result.Summary["unsupported_connector_block"])
+	}
+}
+
+func TestRepairIssueIDsSelectsConnectorBlocks(t *testing.T) {
+	result := DocIntegrityResult{Issues: []DocIntegrityIssue{
+		{Code: "missing_children", ID: "paragraph"},
+		{Code: "unsupported_connector_block", ID: "connector"},
+	}}
+
+	got := repairIssueIDs(result, "connector-blocks")
+	if len(got) != 1 || got[0] != "connector" {
+		t.Fatalf("ids = %#v, want connector", got)
+	}
+}
