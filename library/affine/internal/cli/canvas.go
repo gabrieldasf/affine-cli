@@ -485,6 +485,7 @@ func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 	var backupDir string
 	var apply bool
 	var live bool
+	var connectorsOnly bool
 	cmd := &cobra.Command{
 		Use:   "apply",
 		Short: "Apply or dry-run canvas operations for a generated plan",
@@ -536,6 +537,13 @@ func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 					"live_write_requires":   []string{"--live", "--workspace", "--doc", "--backup-dir", "--yes"},
 				})
 			case canvasPlan:
+				if connectorsOnly {
+					var err error
+					plan, err = canvasPlanConnectorsOnly(plan)
+					if err != nil {
+						return err
+					}
+				}
 				if liveApply && !flags.dryRun {
 					if !flags.yes {
 						return fmt.Errorf("confirmation required: pass --yes for live canvas apply")
@@ -578,7 +586,16 @@ func newCanvasApplyCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&workspaceID, "workspace", "", "AFFiNE workspace ID for live apply")
 	cmd.Flags().StringVar(&docID, "doc", "", "AFFiNE document ID for live apply")
 	cmd.Flags().StringVar(&backupDir, "backup-dir", "", "Directory for before/delta backups when applying")
+	cmd.Flags().BoolVar(&connectorsOnly, "connectors-only", false, "For layout plans, refresh only connectors and preserve current card positions")
 	return cmd
+}
+
+func canvasPlanConnectorsOnly(plan canvasPlan) (canvasPlan, error) {
+	if len(plan.Connections) == 0 {
+		return canvasPlan{}, fmt.Errorf("--connectors-only requires at least one connection")
+	}
+	plan.Nodes = nil
+	return plan, nil
 }
 
 func validateCanvasLayoutApply(plan canvasPlan, workspaceID, docID, backupDir string) error {

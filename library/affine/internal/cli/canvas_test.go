@@ -245,6 +245,35 @@ func TestCanvasLayoutApplyStepsNudgesConnectorsAfterNodes(t *testing.T) {
 	}
 }
 
+func TestCanvasPlanConnectorsOnlyPreservesCardPositions(t *testing.T) {
+	plan, err := canvasPlanConnectorsOnly(canvasPlan{
+		Nodes: []canvasNode{
+			{ID: "a", X: 10, Y: 20, W: 360, H: 220},
+		},
+		Connections: []canvasConnection{
+			{From: "a", To: "b"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("canvasPlanConnectorsOnly error: %v", err)
+	}
+	if len(plan.Nodes) != 0 {
+		t.Fatalf("nodes = %#v, want none", plan.Nodes)
+	}
+	if len(plan.Connections) != 1 {
+		t.Fatalf("connections = %d, want 1", len(plan.Connections))
+	}
+}
+
+func TestCanvasPlanConnectorsOnlyRequiresConnections(t *testing.T) {
+	_, err := canvasPlanConnectorsOnly(canvasPlan{
+		Nodes: []canvasNode{{ID: "a"}},
+	})
+	if err == nil {
+		t.Fatal("error = nil, want missing connections error")
+	}
+}
+
 func TestReadAllOrFileReadsDashFromStdin(t *testing.T) {
 	got, err := readAllOrFile("-", strings.NewReader(`{"ok":true}`))
 	if err != nil {
