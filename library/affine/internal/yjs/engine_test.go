@@ -99,6 +99,49 @@ func TestEncodeAndApply(t *testing.T) {
 	t.Logf("Block: %v", block)
 }
 
+func TestReadBlocksSerializesBoxedYMap(t *testing.T) {
+	e, err := NewEngine()
+	if err != nil {
+		t.Fatal(err)
+	}
+	docID, _ := e.NewDoc()
+	_, err = e.RunScript(`
+		(function() {
+			var doc = globalThis._docs[0];
+			var blocks = doc.getMap("blocks");
+			var surface = new Y.Map();
+			var boxed = new Y.Map();
+			var value = new Y.Map();
+			var edge = new Y.Map();
+			edge.set("id", "edge");
+			edge.set("type", "connector");
+			value.set("edge", edge);
+			boxed.set("type", "$blocksuite:internal:native$");
+			boxed.set("value", value);
+			surface.set("sys:id", "surface");
+			surface.set("sys:flavour", "affine:surface");
+			surface.set("prop:elements", boxed);
+			blocks.set("surface", surface);
+			return "ok";
+		})()
+	`)
+	if err != nil {
+		t.Fatalf("RunScript error: %v", err)
+	}
+	blocks, err := e.ReadBlocks(docID)
+	if err != nil {
+		t.Fatalf("ReadBlocks error: %v", err)
+	}
+	elements, ok := blocks["surface"]["prop:elements"].(map[string]any)
+	if !ok {
+		t.Fatalf("prop:elements = %#v, want object", blocks["surface"]["prop:elements"])
+	}
+	value, ok := elements["value"].(map[string]any)
+	if !ok || value["edge"] == nil {
+		t.Fatalf("boxed value = %#v, want edge", elements["value"])
+	}
+}
+
 func TestReadMeta(t *testing.T) {
 	e, err := NewEngine()
 	if err != nil {

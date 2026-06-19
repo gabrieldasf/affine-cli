@@ -60,6 +60,46 @@ func TestSearchBlocksFindsConnectorEndpoint(t *testing.T) {
 	}
 }
 
+func TestSearchBlocksFindsSurfaceConnectorEndpoint(t *testing.T) {
+	result, err := SearchBlocks("doc-1", map[string]map[string]any{
+		"surface": {
+			"sys:id":      "surface",
+			"sys:flavour": "affine:surface",
+			"prop:elements": map[string]any{
+				"type": "$blocksuite:internal:native$",
+				"value": map[string]any{
+					"edge": map[string]any{
+						"id":     "edge",
+						"type":   "connector",
+						"source": map[string]any{"id": "a"},
+						"target": map[string]any{"id": "b"},
+					},
+				},
+			},
+		},
+		"a": {
+			"sys:id":      "a",
+			"sys:flavour": "affine:note",
+			"prop:xywh":   "[0,0,100,100]",
+		},
+		"b": {
+			"sys:id":      "b",
+			"sys:flavour": "affine:note",
+			"prop:xywh":   "[200,0,100,100]",
+		},
+	}, SearchOptions{Flavour: "affine:connector", ConnectorFrom: "a", ConnectorTo: "b", Bounds: "100,0,100,100"})
+	if err != nil {
+		t.Fatalf("SearchBlocks error: %v", err)
+	}
+	if result.Count != 1 {
+		t.Fatalf("Count = %d, want 1: %#v", result.Count, result.Entities)
+	}
+	got := result.Entities[0]
+	if got.ID != "edge" || got.ParentID != "surface" || got.ConnectorSource != "a" || got.ConnectorTarget != "b" {
+		t.Fatalf("entity = %#v, want surface connector", got)
+	}
+}
+
 func TestSearchBlocksHonorsSourceMode(t *testing.T) {
 	result, err := SearchBlocks("doc-1", map[string]map[string]any{
 		"page": {

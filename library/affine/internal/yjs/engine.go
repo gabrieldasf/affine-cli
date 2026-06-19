@@ -240,38 +240,32 @@ func (e *Engine) ReadBlocks(docID int) (map[string]map[string]any, error) {
 		(function() {
 			var doc = globalThis._docs[_docId];
 			var blocks = doc.getMap("blocks");
+			function toPlain(v) {
+				if (v instanceof Y.Text) return v.toString();
+				if (v instanceof Y.Array) {
+					var arr = [];
+					v.forEach(function(item) { arr.push(toPlain(item)); });
+					return arr;
+				}
+				if (v instanceof Y.Map) {
+					var obj = {};
+					v.forEach(function(val, key) { obj[key] = toPlain(val); });
+					return obj;
+				}
+				if (Array.isArray(v)) return v.map(toPlain);
+				if (v && typeof v === "object") {
+					var out = {};
+					for (var k in v) out[k] = toPlain(v[k]);
+					return out;
+				}
+				return v;
+			}
 			var result = {};
 			blocks.forEach(function(block, blockId) {
 				if (!(block instanceof Y.Map)) return;
 				var b = {};
 				block.forEach(function(v, k) {
-					if (v instanceof Y.Text) b[k] = v.toString();
-					else if (v instanceof Y.Array) {
-						var arr = [];
-						v.forEach(function(item) {
-							if (typeof item === "string") arr.push(item);
-							else if (item instanceof Y.Map) {
-								var obj = {};
-								item.forEach(function(val, key) {
-									if (val instanceof Y.Text) obj[key] = val.toString();
-									else obj[key] = val;
-								});
-								arr.push(obj);
-							} else {
-								arr.push(item);
-							}
-						});
-						b[k] = arr;
-					} else if (v instanceof Y.Map) {
-						var obj = {};
-						v.forEach(function(val, key) {
-							if (val instanceof Y.Text) obj[key] = val.toString();
-							else obj[key] = val;
-						});
-						b[k] = obj;
-					} else {
-						b[k] = v;
-					}
+					b[k] = toPlain(v);
 				});
 				result[blockId] = b;
 			});

@@ -2,6 +2,8 @@ package canvaswrite
 
 import (
 	"fmt"
+	"math"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -93,13 +95,22 @@ func SearchBlocks(docID string, blocks map[string]map[string]any, opts SearchOpt
 	issuesByID := searchIntegrityIssues(docID, blocks)
 	parentByChild := searchParentByChild(blocks)
 	result := SearchResult{DocID: docID, Timestamp: opts.Timestamp, SourceMode: sourceMode}
-	for _, id := range sortedBlockIDs(blocks) {
-		entity := buildSearchEntity(id, blocks, parentByChild[id], issuesByID[id], opts.TextLimit)
+	add := func(entity SearchEntity) bool {
 		if !matchesSearch(entity, opts, bounds, hasBounds) {
-			continue
+			return true
 		}
 		result.Entities = append(result.Entities, entity)
-		if opts.Limit > 0 && len(result.Entities) >= opts.Limit {
+		return opts.Limit <= 0 || len(result.Entities) < opts.Limit
+	}
+	for _, id := range sortedBlockIDs(blocks) {
+		entity := buildSearchEntity(id, blocks, parentByChild[id], issuesByID[id], opts.TextLimit)
+		if !add(entity) {
+			result.Count = len(result.Entities)
+			return result, nil
+		}
+	}
+	for _, entity := range surfaceConnectorEntities(blocks) {
+		if !add(entity) {
 			break
 		}
 	}
@@ -184,6 +195,85 @@ func searchKind(block map[string]any) string {
 	default:
 		return "block"
 	}
+}
+
+func surfaceConnectorEntities(blocks map[string]map[string]any) []SearchEntity {
+	var out []SearchEntity
+	for _, surfaceID := range sortedBlockIDs(blocks) {
+		surface := blocks[surfaceID]
+		if stringField(surface, "sys:flavour") != "affine:surface" {
+			continue
+		}
+		elements := nativeElements(surface["prop:elements"])
+		for _, id := range sortedAnyKeys(elements) {
+			el := mapAny(elements[id])
+			if stringField(el, "type") != "connector" {
+				continue
+			}
+			sourceID := nestedID(el["source"])
+			targetID := nestedID(el["target"])
+			entity := SearchEntity{
+				ID:              id,
+				Kind:            "connector",
+				Flavour:         "affine:connector",
+				ParentID:        surfaceID,
+				ConnectorSource: sourceID,
+				ConnectorTarget: targetID,
+			}
+			if xywh, ok := connectorXYWH(blocks[sourceID], blocks[targetID]); ok {
+				entity.XYWH = xywh
+			}
+			out = append(out, entity)
+		}
+	}
+	return out
+}
+
+func nativeElements(raw any) map[string]any {
+	obj := mapAny(raw)
+	if obj == nil {
+		return nil
+	}
+	if obj["type"] == "$blocksuite:internal:native$" {
+		return mapAny(obj["value"])
+	}
+	return obj
+}
+
+func mapAny(raw any) map[string]any {
+	if raw == nil {
+		return nil
+	}
+	if m, ok := raw.(map[string]any); ok {
+		return m
+	}
+	return nil
+}
+
+func nestedID(raw any) string {
+	return stringField(mapAny(raw), "id")
+}
+
+func connectorXYWH(source, target map[string]any) ([]float64, bool) {
+	a, okA := parseXYWH(stringField(source, "prop:xywh"))
+	b, okB := parseXYWH(stringField(target, "prop:xywh"))
+	if !okA || !okB {
+		return nil, false
+	}
+	ax, ay := a[0]+a[2]/2, a[1]+a[3]/2
+	bx, by := b[0]+b[2]/2, b[1]+b[3]/2
+	x, y := math.Min(ax, bx), math.Min(ay, by)
+	w, h := math.Max(1, math.Abs(bx-ax)), math.Max(1, math.Abs(by-ay))
+	return []float64{x, y, w, h}, true
+}
+
+func sortedAnyKeys(m map[string]any) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func searchText(blocks map[string]map[string]any, id string, seen map[string]bool) string {

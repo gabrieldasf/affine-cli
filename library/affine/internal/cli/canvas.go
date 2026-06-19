@@ -642,26 +642,48 @@ func applyCanvasLayoutPlan(cfg *config.Config, plan canvasPlan, workspaceID, doc
 	if err != nil {
 		return canvasLayoutApplyResult{}, err
 	}
-	rawPatch, err := engine.RunScript(canvasLayoutApplyScript(doc, plan))
-	if err != nil {
-		return canvasLayoutApplyResult{}, fmt.Errorf("apply canvas layout: %w", err)
+	var patch struct {
+		UpsertedNodes      []string `json:"upserted_nodes"`
+		UpsertedConnectors []string `json:"upserted_connectors"`
 	}
-	blocks, err = engine.ReadBlocks(doc)
-	if err != nil {
-		return canvasLayoutApplyResult{}, err
-	}
-	if err := canvaswrite.EnsureBlocksIntegrity(docID, blocks, "after local layout apply"); err != nil {
-		return canvasLayoutApplyResult{}, err
-	}
-	delta, err := engine.EncodeDelta(doc, stateVector)
-	if err != nil {
-		return canvasLayoutApplyResult{}, err
-	}
-	if err := writeCanvasApplyBackup(backupDir, "delta", delta); err != nil {
-		return canvasLayoutApplyResult{}, err
-	}
-	if err := client.PushDocUpdate(workspaceID, docID, delta); err != nil {
-		return canvasLayoutApplyResult{}, err
+	steps := canvasLayoutApplySteps(plan)
+	proofFields := []string{"before.bin", "before.b64", "post_integrity"}
+	for _, step := range steps {
+		rawPatch, err := engine.RunScript(canvasLayoutApplyScript(doc, step.plan))
+		if err != nil {
+			return canvasLayoutApplyResult{}, fmt.Errorf("apply canvas layout %s: %w", step.name, err)
+		}
+		var stepPatch struct {
+			UpsertedNodes      []string `json:"upserted_nodes"`
+			UpsertedConnectors []string `json:"upserted_connectors"`
+		}
+		if err := json.Unmarshal([]byte(rawPatch), &stepPatch); err != nil {
+			return canvasLayoutApplyResult{}, fmt.Errorf("parse layout apply result %s: %w", step.name, err)
+		}
+		patch.UpsertedNodes = append(patch.UpsertedNodes, stepPatch.UpsertedNodes...)
+		patch.UpsertedConnectors = append(patch.UpsertedConnectors, stepPatch.UpsertedConnectors...)
+		blocks, err = engine.ReadBlocks(doc)
+		if err != nil {
+			return canvasLayoutApplyResult{}, err
+		}
+		if err := canvaswrite.EnsureBlocksIntegrity(docID, blocks, "after local layout "+step.name); err != nil {
+			return canvasLayoutApplyResult{}, err
+		}
+		delta, err := engine.EncodeDelta(doc, stateVector)
+		if err != nil {
+			return canvasLayoutApplyResult{}, err
+		}
+		if err := writeCanvasApplyBackup(backupDir, "delta-"+step.name, delta); err != nil {
+			return canvasLayoutApplyResult{}, err
+		}
+		proofFields = append(proofFields, "delta-"+step.name+".bin", "delta-"+step.name+".b64")
+		if err := client.PushDocUpdate(workspaceID, docID, delta); err != nil {
+			return canvasLayoutApplyResult{}, err
+		}
+		stateVector, err = engine.SaveStateVector(doc)
+		if err != nil {
+			return canvasLayoutApplyResult{}, err
+		}
 	}
 	reloaded, err := client.LoadDoc(workspaceID, docID)
 	if err != nil {
@@ -679,13 +701,6 @@ func applyCanvasLayoutPlan(cfg *config.Config, plan canvasPlan, workspaceID, doc
 	if !after.OK {
 		return canvasLayoutApplyResult{}, fmt.Errorf("canvas doc integrity failed after pushed layout")
 	}
-	var patch struct {
-		UpsertedNodes      []string `json:"upserted_nodes"`
-		UpsertedConnectors []string `json:"upserted_connectors"`
-	}
-	if err := json.Unmarshal([]byte(rawPatch), &patch); err != nil {
-		return canvasLayoutApplyResult{}, fmt.Errorf("parse layout apply result: %w", err)
-	}
 	return canvasLayoutApplyResult{
 		PlanType:           "canvas_layout",
 		DocID:              docID,
@@ -696,8 +711,28 @@ func applyCanvasLayoutPlan(cfg *config.Config, plan canvasPlan, workspaceID, doc
 		UpsertedConnectors: patch.UpsertedConnectors,
 		Before:             before,
 		After:              after,
-		Proof:              canvaswrite.TransformProof{Required: true, Fields: []string{"before.bin", "before.b64", "delta.bin", "delta.b64", "post_integrity"}},
+		Proof:              canvaswrite.TransformProof{Required: true, Fields: proofFields},
 	}, nil
+}
+
+type canvasLayoutApplyStep struct {
+	name string
+	plan canvasPlan
+}
+
+func canvasLayoutApplySteps(plan canvasPlan) []canvasLayoutApplyStep {
+	var steps []canvasLayoutApplyStep
+	if len(plan.Nodes) > 0 {
+		step := plan
+		step.Connections = nil
+		steps = append(steps, canvasLayoutApplyStep{name: "nodes", plan: step})
+	}
+	if len(plan.Connections) > 0 {
+		step := plan
+		step.Nodes = nil
+		steps = append(steps, canvasLayoutApplyStep{name: "connectors", plan: step})
+	}
+	return steps
 }
 
 func canvasLayoutApplyScript(doc int, plan canvasPlan) string {
@@ -738,6 +773,7 @@ func canvasLayoutApplyScript(doc int, plan canvasPlan) string {
 				var n = plan.nodes[i];
 				if (!n.id) throw new Error("node missing id");
 				var note = blocks.get(n.id);
+				var createdNote = false;
 				if (!(note instanceof Y.Map)) {
 					note = new Y.Map();
 					note.set("sys:id", n.id);
@@ -748,6 +784,7 @@ func canvasLayoutApplyScript(doc int, plan canvasPlan) string {
 					note.set("prop:hidden", false);
 					note.set("prop:index", "a0");
 					blocks.set(n.id, note);
+					createdNote = true;
 				}
 				note.set("prop:xywh", xywh(n));
 				var children = note.get("sys:children");
@@ -755,20 +792,22 @@ func canvasLayoutApplyScript(doc int, plan canvasPlan) string {
 					children = new Y.Array();
 					note.set("sys:children", children);
 				}
-				var textId = n.id + "-text";
-				var textBlock = blocks.get(textId);
-				if (!(textBlock instanceof Y.Map)) {
-					textBlock = new Y.Map();
-					textBlock.set("sys:id", textId);
-					textBlock.set("sys:flavour", "affine:paragraph");
-					textBlock.set("sys:version", 1);
-					textBlock.set("sys:type", "text");
-					textBlock.set("prop:type", "text");
-					textBlock.set("sys:children", new Y.Array());
-					blocks.set(textId, textBlock);
+				if (createdNote || n.text) {
+					var textId = n.id + "-text";
+					var textBlock = blocks.get(textId);
+					if (!(textBlock instanceof Y.Map)) {
+						textBlock = new Y.Map();
+						textBlock.set("sys:id", textId);
+						textBlock.set("sys:flavour", "affine:paragraph");
+						textBlock.set("sys:version", 1);
+						textBlock.set("sys:type", "text");
+						textBlock.set("prop:type", "text");
+						textBlock.set("sys:children", new Y.Array());
+						blocks.set(textId, textBlock);
+					}
+					textBlock.set("prop:text", ytext(n.text || n.id));
+					if (!hasChild(children, textId)) children.insert(children.length, [textId]);
 				}
-				textBlock.set("prop:text", ytext(n.text || n.id));
-				if (!hasChild(children, textId)) children.insert(children.length, [textId]);
 				if (!hasChild(pageChildren, n.id)) pageChildren.push([n.id]);
 				byName[n.id] = n.id;
 				if (n.text) byName[n.text] = n.id;
@@ -777,49 +816,112 @@ func canvasLayoutApplyScript(doc int, plan canvasPlan) string {
 			function endpoint(value) {
 				return byName[value] || value;
 			}
-			function connBounds(from, to) {
+			function blockCenter(id) {
 				function parse(id) {
 					var b = blocks.get(id);
 					var s = b && b.get("prop:xywh");
 					var parts = String(s || "0,0,1,1").replace(/[\[\]]/g, "").split(",");
 					return parts.map(function(p) { return Number(p) || 0; });
 				}
-				var a = parse(from), b = parse(to);
-				var ax = a[0] + a[2] / 2, ay = a[1] + a[3] / 2;
-				var bx = b[0] + b[2] / 2, by = b[1] + b[3] / 2;
-				return "[" + [Math.min(ax, bx), Math.min(ay, by), Math.max(1, Math.abs(bx - ax)), Math.max(1, Math.abs(by - ay))].join(",") + "]";
+				var xywh = parse(id);
+				return {x: xywh[0] + xywh[2] / 2, y: xywh[1] + xywh[3] / 2};
 			}
+			function connectorAnchors(from, to) {
+				var a = blockCenter(from), b = blockCenter(to);
+				if (Math.abs(b.y - a.y) > 80) {
+					return b.y >= a.y
+						? {source: [0.5, 1], target: [0.5, 0]}
+						: {source: [0.5, 0], target: [0.5, 1]};
+				}
+				return b.x >= a.x
+					? {source: [1, 0.5], target: [0, 0.5]}
+					: {source: [0, 0.5], target: [1, 0.5]};
+			}
+			function connectorID(from, to) {
+				var s = from + ">" + to;
+				var h = 2166136261;
+				for (var i = 0; i < s.length; i++) {
+					h ^= s.charCodeAt(i);
+					h = Math.imul(h, 16777619);
+				}
+				return "c" + (h >>> 0).toString(36).padStart(9, "0").slice(0, 9);
+			}
+			function connectorIndex(i) {
+				return "av" + String(i).padStart(4, "0");
+			}
+			function surfaceElements() {
+				var surface = null;
+				blocks.forEach(function(block) {
+					if (!surface && block instanceof Y.Map && block.get("sys:flavour") === "affine:surface") surface = block;
+				});
+				if (!(surface instanceof Y.Map)) throw new Error("surface block not found");
+				var raw = surface.get("prop:elements");
+				var boxed = raw instanceof Y.Map && raw.get("type") === "$blocksuite:internal:native$";
+				var value = boxed ? raw.get("value") : raw;
+				var valueMap = value instanceof Y.Map && boxed ? value : new Y.Map();
+				if (value instanceof Y.Map && !boxed) {
+					value.forEach(function(existing, k) { valueMap.set(k, existing); });
+				}
+				if (!(value instanceof Y.Map) && value && typeof value === "object") {
+					var plain = value.type === "$blocksuite:internal:native$" ? value.value : value;
+					for (var k in plain) {
+						if (k.charAt(0) === "_") continue;
+						var existing = plain[k];
+						if (existing instanceof Y.Map) {
+							valueMap.set(k, existing);
+						} else if (existing && typeof existing === "object") {
+							var elementMap = new Y.Map();
+							for (var prop in existing) elementMap.set(prop, existing[prop]);
+							valueMap.set(k, elementMap);
+						}
+					}
+				}
+				return {surface: surface, value: valueMap, boxed: boxed};
+			}
+			var surface = null;
 			var upsertedConnectors = [];
 			for (var c = 0; c < (plan.connections || []).length; c++) {
+				if (!surface) surface = surfaceElements();
 				var edge = plan.connections[c];
 				var from = endpoint(edge.from);
 				var to = endpoint(edge.to);
 				if (!(blocks.get(from) instanceof Y.Map)) throw new Error("missing connector source: " + edge.from);
 				if (!(blocks.get(to) instanceof Y.Map)) throw new Error("missing connector target: " + edge.to);
-				var id = "conn-" + from + "-" + to;
-				var conn = blocks.get(id);
-				if (!(conn instanceof Y.Map)) {
-					conn = new Y.Map();
-					conn.set("sys:id", id);
-					conn.set("sys:flavour", "affine:connector");
-					conn.set("sys:version", 1);
-					conn.set("sys:children", new Y.Array());
-					conn.set("prop:hidden", false);
-					conn.set("prop:index", "a0");
-					conn.set("prop:lockedBySelf", false);
-					conn.set("prop:mode", "orthogonal");
-					conn.set("prop:strokeStyle", "solid");
-					conn.set("prop:strokeWidth", 2);
-					conn.set("prop:stroke", "#111827");
-					conn.set("prop:endArrow", true);
-					blocks.set(id, conn);
-				}
-				conn.set("prop:source", from);
-				conn.set("prop:target", to);
-				conn.set("prop:label", edge.type || "");
-				conn.set("prop:xywh", connBounds(from, to));
-				if (!hasChild(pageChildren, id)) pageChildren.push([id]);
+				var id = connectorID(from, to);
+				var anchors = connectorAnchors(from, to);
+				var element = new Y.Map();
+				element.set("id", id);
+				element.set("type", "connector");
+				element.set("index", connectorIndex(c));
+				element.set("mode", 2);
+				element.set("source", {id: from, position: anchors.source});
+				element.set("target", {id: to, position: anchors.target});
+				element.set("stroke", "#929292");
+				element.set("strokeStyle", "solid");
+				element.set("strokeWidth", 2);
+				element.set("frontEndpointStyle", "None");
+				element.set("rearEndpointStyle", "Arrow");
+				element.set("rough", false);
+				element.set("roughness", 1.4);
+				element.set("seed", Math.floor(Math.random() * 2147483647));
+				element.set("labelStyle", {
+					color: {dark: "#ffffff", light: "#000000"},
+					fontFamily: "blocksuite:surface:Inter",
+					fontSize: 16,
+					fontStyle: "normal",
+					fontWeight: "400",
+					textAlign: "center"
+				});
+				surface.value.set(id, element);
 				upsertedConnectors.push(id);
+			}
+			if (surface) {
+				if (!surface.boxed) {
+					var boxed = new Y.Map();
+					boxed.set("type", "$blocksuite:internal:native$");
+					boxed.set("value", surface.value);
+					surface.surface.set("prop:elements", boxed);
+				}
 			}
 			return JSON.stringify({upserted_nodes: upsertedNodes, upserted_connectors: upsertedConnectors});
 		})()
@@ -1289,18 +1391,19 @@ func validateCanvasPlan(plan canvasPlan) canvasValidationReport {
 			Message:  "plan frame is empty",
 		})
 	}
-	if plan.Orientation != "vertical" && plan.Orientation != "horizontal" {
+	hasNodes := len(plan.Nodes) > 0
+	if hasNodes && plan.Orientation != "vertical" && plan.Orientation != "horizontal" {
 		issues = append(issues, canvasValidationIssue{
 			Severity: "error",
 			Code:     "unknown_orientation",
 			Message:  "orientation must be vertical or horizontal",
 		})
 	}
-	if len(plan.Nodes) == 0 {
+	if !hasNodes && len(plan.Connections) == 0 {
 		issues = append(issues, canvasValidationIssue{
 			Severity: "error",
-			Code:     "empty_nodes",
-			Message:  "plan has no nodes",
+			Code:     "empty_plan",
+			Message:  "plan has no nodes or connections",
 		})
 	}
 
@@ -1347,7 +1450,7 @@ func validateCanvasPlan(plan canvasPlan) canvasValidationReport {
 			})
 			continue
 		}
-		if !known[conn.From] || !known[conn.To] {
+		if hasNodes && (!known[conn.From] || !known[conn.To]) {
 			issues = append(issues, canvasValidationIssue{
 				Severity: "error",
 				Code:     "orphan_connection",
@@ -1434,7 +1537,7 @@ func splitCanvasKeywords(s string) []string {
 }
 
 func readAllOrFile(path string, stdin io.Reader) ([]byte, error) {
-	if path != "" {
+	if path != "" && path != "-" {
 		return os.ReadFile(path)
 	}
 	data, err := io.ReadAll(stdin)

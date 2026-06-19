@@ -212,3 +212,45 @@ func TestValidateCanvasPlanDetectsOrphanConnection(t *testing.T) {
 		t.Fatalf("first issue code = %q, want orphan_connection", report.Issues[0].Code)
 	}
 }
+
+func TestValidateCanvasPlanAllowsConnectionOnlyApply(t *testing.T) {
+	report := validateCanvasPlan(canvasPlan{
+		Connections: []canvasConnection{
+			{From: "existing-a", To: "existing-b"},
+		},
+	})
+
+	if !report.OK {
+		t.Fatalf("OK = false, want true: %#v", report.Issues)
+	}
+}
+
+func TestCanvasLayoutApplyStepsNudgesConnectorsAfterNodes(t *testing.T) {
+	steps := canvasLayoutApplySteps(canvasPlan{
+		Nodes: []canvasNode{
+			{ID: "a", W: 360, H: 220},
+		},
+		Connections: []canvasConnection{
+			{From: "a", To: "b"},
+		},
+	})
+	if len(steps) != 2 {
+		t.Fatalf("steps = %d, want 2", len(steps))
+	}
+	if steps[0].name != "nodes" || len(steps[0].plan.Connections) != 0 {
+		t.Fatalf("first step = %#v, want nodes-only", steps[0])
+	}
+	if steps[1].name != "connectors" || len(steps[1].plan.Nodes) != 0 {
+		t.Fatalf("second step = %#v, want connectors-only", steps[1])
+	}
+}
+
+func TestReadAllOrFileReadsDashFromStdin(t *testing.T) {
+	got, err := readAllOrFile("-", strings.NewReader(`{"ok":true}`))
+	if err != nil {
+		t.Fatalf("readAllOrFile error: %v", err)
+	}
+	if string(got) != `{"ok":true}` {
+		t.Fatalf("got %q, want stdin payload", string(got))
+	}
+}
