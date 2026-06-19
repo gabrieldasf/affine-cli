@@ -2,8 +2,8 @@
 
 ## Current Status
 
-- Active milestone: v1.1 Canvas Power Tools
-- Current phase: Phase 4 complete; v1.1 ready for final branch cleanup
+- Active milestone: none
+- Current phase: v1.1 Canvas Power Tools shipped; ready for next milestone planning
 - Last planning update: 2026-06-19
 - Git baseline: main at 4f9a09c3
 
@@ -24,7 +24,19 @@
 - Phase 3 implemented `canvas transform` dry-run operation plans and transform-plan compatibility in `canvas apply --dry-run`.
 - Verification passed: `go test ./internal/canvaswrite ./internal/cli`, `go test ./...`, `go run ./cmd/affine-pp-cli canvas transform --help`, `go run ./cmd/affine-pp-cli which "canvas transform" --json`, and selector-to-apply dry-run smoke.
 - Phase 4 implemented gated live apply for transform and layout Canvas plans with required `--live` or `--apply`, `--workspace`, `--doc`, `--backup-dir`, and `--yes`; semantic diff preview, backups, pre/post integrity, tests, live fixture smoke, and workflow proof passed.
+- Milestone v1.1 completed with accepted tech debt documented in `.planning/v1.1-MILESTONE-AUDIT.md`.
 
 ## Next Action
 
-Finish branch cleanup and prepare ship review for v1.1 Canvas Power Tools.
+Run `$gsd-new-milestone` to define the next AFFiNE CLI milestone.
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-06-19:
+
+| Category | Item | Status |
+|---|---|---|
+| workflow-proof | Add search, diff, and doc-integrity smoke steps to `workflow_verify.yaml` | deferred |
+| live-apply-proof | Assert post-reload fields for every transform operation | deferred |
+| gsd-process | Generate phase summaries and Nyquist validation artifacts in future milestones | deferred |
+| requirements-traceability | Use formal traceability table in next milestone requirements | deferred |
